@@ -1,2 +1,2 @@
-Used for configuring roster
+Used for manual configuration of roster
 Format to be determined
