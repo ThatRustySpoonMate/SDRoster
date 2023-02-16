@@ -1,0 +1,2 @@
+Used for configuring roster
+Format to be determined
