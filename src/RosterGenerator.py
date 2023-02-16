@@ -50,7 +50,7 @@ def GeneratePendingsRoster(shiftList):
     while currentTime < latestEnd and counter < 15:
         if not availableShifts:
             break
-
+            
         randomInt = random.randint(0, len(availableShifts) - 1)
 
         # Make sure the allocated time falls within the staff's shift
