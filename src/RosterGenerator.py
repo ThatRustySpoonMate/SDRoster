@@ -1,3 +1,5 @@
+# OLD SCRIPT -- USED AS A REFERENCE
+
 import tkinter
 # import matplotlib.pyplot as plt
 import webbrowser
@@ -8,6 +10,7 @@ from tkinter import *
 import pyperclip
 import random
 import win32com.client
+
 
 """
 Rules of this generator:
