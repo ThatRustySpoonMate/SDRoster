@@ -1,5 +1,4 @@
 # TODO: Write GUI
-# TODO: Work out fonts
 import tkinter as tk
 from tkinter import ttk # Can be used to stylize widgets, nice to have, I probably wont use it 
 from Normies import WSUStaff
