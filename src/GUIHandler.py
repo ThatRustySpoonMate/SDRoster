@@ -1,3 +1,5 @@
 # TODO: Write GUI
 
-from tkinter import *
+import tkinter as tk
+
+
