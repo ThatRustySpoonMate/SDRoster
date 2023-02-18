@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta
-from enum import Enum
+from datetime import datetime
 import requests
 
 # The types of shifts that can be assigned in humanity
@@ -25,6 +24,10 @@ shift_types = {"Casual - SD", "Full Time - SD", "Senior Queue Escalation - SD", 
 # This function calls the API uses today's date as the date range
 # This function also validates that the call was completed successfully
 # Checking for valid keys and the API response
+# 	Return value - array of formatted shift objects that contain:
+#				[0] - Full Name "Joe Blow"
+#				[1] - Shift start time - %Y-%m-%d%I:%M%p format
+#				[2] - Shift End time - %Y-%m-%d%I:%M%p format
 def get_shift_data():
 	# Gets the current date and formats into a string to be used in API call
 	# Formats a datetime object into a string, format is year-month-day i.e 2022-06-25
@@ -32,9 +35,12 @@ def get_shift_data():
 
 	# @TODO load token file correctly, below lines are temporary
 	api_token_file = open('tokenFile.txt') # place holder file opening
-	api_token = api_token_file.read()
+	api_token = api_token_file.read() 
 
 	request_url = "https://www.humanity.com/api/v2/shifts?start_date=" + today_date + "&end_date=" + today_date + "&access_token=" + api_token
+
+	# URL for testing
+	# request_url = "https://www.humanity.com/api/v2/shifts?start_date=asfasf" + "&end_date=" + "2023-02-17" + "&access_token=" + api_token
 
 	api_response = requests.get(request_url)
 
@@ -55,22 +61,31 @@ def get_shift_data():
 			if not formatted_shift_data:
 				print("No shifts after formatting raw shift data")
 			else:
+				print(formatted_shift_data)
 				return formatted_shift_data
-		# if this else statement has reached, the API has returned with error
-		# @TODO make error meaningful	
-		else:
-			print("Something went wrong calling API")
+		else: # returns with errors
+			#@TODO proper GUI feedback
+			api_error_data = api_response.json()
+			print(api_error_data['data']) # prints general error message
+			print(api_error_data['error']) # print specific hint error
 			
 	else:
 		# temp output
 		#@TODO GUI prompt for new key
-		print("Invalid API Token key")
+		api_error_data = api_response.json()
+		print(api_error_data['data']) # prints general error message
+		print(api_error_data['error']) # print specific hint error
 		
 
 
 
 # This function takes in a response and removes data note required for the roster generator
 #	shift_list - Raw response data from API call, should be in the form of an object array
+#	today_date - datetime object containing the current day
+# 	Return value - array of shift objects that contain:
+#				[0] - Full Name "Joe Blow"
+#				[1] - Shift start time - %Y-%m-%d%I:%M%p format
+#				[2] - Shift End time - %Y-%m-%d%I:%M%p format
 def trim_data(raw_shift_data, today_date):
 	shifts = []
 
@@ -89,11 +104,10 @@ def trim_data(raw_shift_data, today_date):
 			for employee in item['employees']:
 				employee_shift = [employee['name'], start_time, end_time, shift_length]
 				shifts.append(employee_shift)
-		#@TODO make error meaningful
-		else:
-			print("No valid shifts or no employees to roster")
 
 	return shifts
 
+if __name__ == "__main__" :
+    return_val = get_shift_data()
 		
 		

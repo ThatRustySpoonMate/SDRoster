@@ -23,6 +23,7 @@ class ITSDStaff():
 	# increments chat weight proportional to the employee's chat competency so that more experienced people are more likely to be on chat
 	# this should be called whenever the employee is not assigned to chat
 	# chat weighting used to more evenly distribute chat, as employees chance of being on chat increases as chat_weight increases
+	# @TODO implement more robust chat weighting increment
 	def increment_chat_weight(self):
 		self.chat_weight += self.chat_competency
 
