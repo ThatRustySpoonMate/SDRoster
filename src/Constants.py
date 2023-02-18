@@ -21,6 +21,8 @@ HOT_PINK = "#FF69B4"
 DARK_PINK = "#E75480"
 TURQUOISE = "#30D5C8"
 LIGHT_GREY = "#bebebe"
+MEDIUM_GREY = "#7D7F7C"
+DARK_SLATE_BLUE = "#06394f"
 
 # WSU Colours definition
 WSU_CRIMSON = "#990033"
@@ -34,6 +36,7 @@ TEXT_COL = WSU_BLACK
 BTN_COL = WSU_ORANGE
 TEXT_INPT_BG = LIGHT_GREY
 TEXT_INPT_FG = DARK_GREY
+NAV_BAR_COL = LIGHT_GREY 
 
 # Macro Defintions
 SUCCESS = True
@@ -45,3 +48,4 @@ UI_FOLDER = "{}\\SDRoster\\UI\\".format(os.getcwd())
 DATA_FOLDER = "{}\\SDRoster\\data\\".format(os.getcwd())
 SRC_FOLDER = "{}\\SDRoster\\src\\".format(os.getcwd())
 CNFG_FOLDER = "{}\\SDRoster\\config\\".format(os.getcwd())
+
