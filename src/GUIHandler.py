@@ -129,7 +129,7 @@ class MainMenu(tk.Frame):
         self.APIKeyInput = CreateElement(controller, tk.Text, master=self, height=1, width=40, font=STD_FONT)
         self.APIKeyLoad = CreateElement(controller, tk.Button, master=self, text = "File: Load", font=API_BTN_FONT, command=lambda:self.requestAPIKey(0))
         self.APIKeyRetrieve = CreateElement(controller, tk.Button, master=self, text = "Web: Retrieve", font=API_BTN_FONT, command=lambda:self.requestAPIKey(1))
-        
+        self.APICheck = CreateElement(controller, tk.Button, master=self, text="Check", font=API_BTN_FONT, command=self.checkAPIKey)
         # Add dark mode toggle
         self.darkModeToggle = CreateElement(controller, tk.Button, master=self, text="Enable dark mode", font=STD_FONT, command = self.toggleDarkMode)  
 
@@ -154,6 +154,7 @@ class MainMenu(tk.Frame):
         self.nextButton.place_forget()
         self.APIKeyLoad.place_forget()
         self.APIKeyRetrieve.place_forget()
+        self.APICheck.place_forget()
         self.darkModeToggle.place_forget()
         
 
@@ -172,6 +173,7 @@ class MainMenu(tk.Frame):
         self.APIKeyInput.config(bg = TEXT_INPT_BG, fg = TEXT_INPT_FG)
         self.APIKeyLoad.config(bg= BGND_COL, fg=BTN_COL)
         self.APIKeyRetrieve.config(bg= BGND_COL, fg=BTN_COL)
+        self.APICheck.config(bg = BGND_COL, fg=BTN_COL)
         self.darkModeToggle.config(bg = BGND_COL, fg=BTN_COL)
         self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
 
@@ -215,6 +217,7 @@ class MainMenu(tk.Frame):
         self.APIKeyInput.place(x = (WINDOW_WIDTH / 2 - 170) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 100)
         self.APIKeyLoad.place(x = (WINDOW_WIDTH / 2 - 100) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 130)
         self.APIKeyRetrieve.place(x = (WINDOW_WIDTH / 2 - 0) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 130)
+        self.APICheck.place(x = (WINDOW_WIDTH / 2 + 160) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 95)
         self.darkModeToggle.place(x = (WINDOW_WIDTH / 2 - 64) + (self.controller.showNavBar * self.controller.navBarWidth), y = WINDOW_HEIGHT - 100)
         self.nextButton.place(x = WINDOW_WIDTH - 50, y = WINDOW_HEIGHT - 50)
 
@@ -238,6 +241,13 @@ class MainMenu(tk.Frame):
         self.APIKeyInput.delete(1.0, tk.END) # Delete current contents of API key field
         
         self.APIKeyInput.insert(tk.END, key) # Insert received API key
+
+    def checkAPIKey(self):
+        if(self.controller.messageToMainFunc(4, self.APIKeyInput.get(1.0, tk.END).replace('\n', "")) == NOSUCCESS):
+            messagebox.showerror("API Key Error", "API Key failed\n Please enter a valid Humanity API key") 
+        else:
+            messagebox.showinfo("API Key Success", "API Key successful!") 
+
 
 
 

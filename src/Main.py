@@ -34,6 +34,8 @@ import requests
         No reqParam used
     - 3 = Override of staffmember lunch
         param will be a tuple of the staff member's name and their updated lunch time
+    - 4 = Check API Key
+        apiKey <string>
 """
 def messageFromGUI(reqType, reqParam = 0):
     reply = ""
@@ -57,12 +59,17 @@ def messageFromGUI(reqType, reqParam = 0):
         
     elif(reqType == 3):
         # Update the staff member's lunch time in the staff member object
-
+        staffName = reqParam[0]
+        lunchTime = reqParam[1]
         # If successful
         reply = GUIHandler.SUCCESS
 
         #If unsuccessful
         #reply = GUIHandler.NOSUCCESS
+    
+    elif(reqType == 4):
+        # Requesting to check provided API Key
+        return GUIHandler.SUCCESS
         
         
     print("Returning {}".format(reply))
