@@ -30,7 +30,9 @@ import requests
     - 1 = API Key Request
         0 = From file
         1 = From Web
-    - 2 = Override of staffmember lunch
+    - 2 = Request staff lunch times
+        No reqParam used
+    - 3 = Override of staffmember lunch
         param will be a tuple of the staff member's name and their updated lunch time
 """
 def messageFromGUI(reqType, reqParam = 0):
@@ -57,10 +59,13 @@ def messageFromGUI(reqType, reqParam = 0):
         # Update the staff member's lunch time in the staff member object
 
         # If successful
-        reply = True
+        reply = GUIHandler.SUCCESS
+
+        #If unsuccessful
+        #reply = GUIHandler.NOSUCCESS
         
         
-    
+    print("Returning {}".format(reply))
     return reply
 
 def loadStaff():

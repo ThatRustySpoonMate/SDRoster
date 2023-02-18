@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk # Can be used to stylize widgets, nice to have, I probably wont use it 
+from tkinter import ttk, messagebox# Can be used to stylize widgets, nice to have, I probably wont use it 
 from Normies import WSUStaff
 import random
 import os
@@ -95,8 +95,8 @@ class MainMenu(tk.Frame):
         
         self.firstLoad = True # Flag for first time loading of page
 
-        # Add dark mode toggle
-        self.darkModeToggle = CreateElement(controller, tk.Button, master=self, text="Enable dark mode", font=STD_FONT, command = self.toggleDarkMode)
+        # Hamburger Menu buton
+        self.HamburgerMenuBtn = tk.Button(master=self, image=tk.PhotoImage(file="{}\\UI\\Hamburger.png".format(os.getcwd()) ) )
         
         # Heading
         self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Home", font = MENU_FONT)
@@ -107,6 +107,9 @@ class MainMenu(tk.Frame):
         self.APIKeyLoad = CreateElement(controller, tk.Button, master=self, text = "File: Load", font=API_BTN_FONT, command=lambda:self.requestAPIKey(0))
         self.APIKeyRetrieve = CreateElement(controller, tk.Button, master=self, text = "Web: Retrieve", font=API_BTN_FONT, command=lambda:self.requestAPIKey(1))
         
+        # Add dark mode toggle
+        self.darkModeToggle = CreateElement(controller, tk.Button, master=self, text="Enable dark mode", font=STD_FONT, command = self.toggleDarkMode)  
+
         # Navigation buttons
         self.nextButton = CreateElement(controller, tk.Button, master=self, text=">", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(ConfigurationMenu) )
 
@@ -214,7 +217,8 @@ class MainMenu(tk.Frame):
 
         print(self.controller.messageToMainFunc(0)) # Testing, will delete later
     
-
+    def toggleHamburgerMenu():
+        print("Hamburger Menu Toggled!")
 
 
 class ConfigurationMenu(tk.Frame):
@@ -285,6 +289,15 @@ class LunchRosterMenu(tk.Frame):
         self.parent = parent # Reference to parent container
         self.controller = controller # Reference to parent object
         self.firstLoad = True # Flag for first time loading of page
+
+        self.staffDisplayRowCounter = 0 # Rows is number of staff working today dived by 2 
+        self.staffDisplayColCounter = 0 # Two cols  of staff lunch times will be displayed. 
+        self.staffDisplayCol0 = 125 # Starting X position of col0 staff lunch
+        self.staffDisplayCol1 = WINDOW_WIDTH / 2 + self.staffDisplayCol0 # Starting X position of col1 staff lunch
+        self.staffDisplayStartY = 100 # Starting Y position of col0 row0 staff lunch
+        self.staffDisplayIncrementY = 50 # Gap between each row of staff lunches 
+        self.staffDisplayDrpDwnOffset = 0 # Gap between start of staff name and start of drop-down selector
+
         self.lunchTimes = {} # Dict of all staff and their lunches 
         self.lunchTimeWidgets = {} # dict of staff name as key and array of label, drop-down widget and stringVar literal of the currently selected option e.g. { "ethan":[tk.label, tk.dropDown, StringVar] }
         self.lunch_options = [ # All possible lunch times that will show up in the drop down menu
@@ -324,7 +337,6 @@ class LunchRosterMenu(tk.Frame):
             setString = tk.StringVar() # Create rkinter variable for the selected drop-down value
             setString.set(self.lunchTimes[staffName]) # Set this variable to this staff members allocated lunch time
             self.lunchTimeWidgets[staffName] = [ CreateElement(self.controller, tk.Label, master=self, text = staffName, font=DROP_DOWN_LABEL_FONT), tk.OptionMenu(self, setString, *self.lunch_options, command = partial(self.updateLunch, staffName)), setString ]
-            print(staffName)
         
 
         # Draw all UI elements to screen
@@ -353,9 +365,11 @@ class LunchRosterMenu(tk.Frame):
         self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
         self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
 
+        # Loop through all staff lunch labels and drop-down menus and set their colours accordingly
         for staffName in self.lunchTimeWidgets:
             self.lunchTimeWidgets[staffName][0].config(bg = BGND_COL, fg=TEXT_COL)
-            self.lunchTimeWidgets[staffName][1].config(bg = BGND_COL, fg=TEXT_COL)
+            self.lunchTimeWidgets[staffName][1].config(bg = BGND_COL, fg=BTN_COL)
+            self.lunchTimeWidgets[staffName][1]["highlightthickness"]=0 # Set border size
             
 
         # This is where elements are placed
@@ -363,14 +377,31 @@ class LunchRosterMenu(tk.Frame):
         self.nextButton.place(x = WINDOW_WIDTH - 50, y = WINDOW_HEIGHT - 50)
         self.prevButton.place(x = 20, y = WINDOW_HEIGHT - 50)
 
+         # Loop through all staff lunch labels and drop-down menus and place them 
+        increment = 0
         for staffName in self.lunchTimeWidgets:
-            self.lunchTimeWidgets[staffName][0].place(x = 150, y = 250)
-            self.lunchTimeWidgets[staffName][1].place(x = 200, y = 250)
+
+            self.lunchTimeWidgets[staffName][0].place(x = (self.staffDisplayCol0 - (10*len(staffName)) ) if self.staffDisplayColCounter == 0 else (self.staffDisplayCol1 - (10*len(staffName))), y = self.staffDisplayStartY + (self.staffDisplayRowCounter * self.staffDisplayIncrementY))
+            self.lunchTimeWidgets[staffName][1].place(x = (self.staffDisplayCol0 + self.staffDisplayDrpDwnOffset) if self.staffDisplayColCounter == 0 else (self.staffDisplayCol1 + self.staffDisplayDrpDwnOffset), y = self.staffDisplayStartY + (self.staffDisplayRowCounter * self.staffDisplayIncrementY)) 
+ 
+
+            self.staffDisplayColCounter = not self.staffDisplayColCounter # Alternate rows
+            if(increment % 2 == 1):
+                # Every second loop starting from 0
+                self.staffDisplayRowCounter += 1
+            increment += 1
+        
+        # Reset counters
+        self.staffDisplayColCounter = 0
+        self.staffDisplayRowCounter = 0
 
 
     def updateLunch(self, staffName, lunchTime):
         print("Updating lunch for {} to {}".format(staffName, lunchTime))
-        self.controller.messageToMainFunc(2, (staffName, lunchTime))
+        if( self.controller.messageToMainFunc(3, (staffName, lunchTime)) == NOSUCCESS):
+            # Unable to update lunch time
+            messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
+
         return
 
         
