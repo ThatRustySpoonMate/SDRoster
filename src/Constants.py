@@ -1,3 +1,4 @@
+import os
 
 # GUI Window parameters
 WINDOW_WIDTH = 600
@@ -34,6 +35,13 @@ BTN_COL = WSU_ORANGE
 TEXT_INPT_BG = LIGHT_GREY
 TEXT_INPT_FG = DARK_GREY
 
+# Macro Defintions
 SUCCESS = True
 NOSUCCESS = False
 
+
+# Folder Paths
+UI_FOLDER = "{}\\SDRoster\\UI\\".format(os.getcwd())
+DATA_FOLDER = "{}\\SDRoster\\data\\".format(os.getcwd())
+SRC_FOLDER = "{}\\SDRoster\\src\\".format(os.getcwd())
+CNFG_FOLDER = "{}\\SDRoster\\config\\".format(os.getcwd())

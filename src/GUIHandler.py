@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk, messagebox# Can be used to stylize widgets, nice to have, I probably wont use it 
 from Normies import WSUStaff
 import random
-import os
 from Constants import *
 from functools import partial # This is pure magic
 
@@ -26,9 +25,11 @@ class RosterWindow(tk.Tk):
 
         self.messageToMainFunc = messageToMainFunc
         tk.Tk.__init__(self, *args, **kwargs)
-        self.ShowNavBar = False
 
+        self.showNavBar = False # Hamburger menu toggle
+        self.navBarWidth = 75
         self.EEM = 0 # 0 = Deafult, 1 = Pink text/UI elements, 2 = Uwuify'd text/UI elements
+
         if("isabel" in os.getlogin().lower()): # Change to Isabel's staff number
             self.EEM = 1  # Isabel Detected
         elif(random.randrange(0, 30) == 23):
@@ -96,7 +97,9 @@ class MainMenu(tk.Frame):
         self.firstLoad = True # Flag for first time loading of page
 
         # Hamburger Menu buton
-        self.HamburgerMenuBtn = tk.Button(master=self, image=tk.PhotoImage(file="{}\\UI\\Hamburger.png".format(os.getcwd()) ) )
+        self.hamburgerIconLight = tk.PhotoImage(file = "{}HamburgerLight.png".format(UI_FOLDER))
+        self.hamburgerIconDark = tk.PhotoImage(file = "{}HamburgerDark.png".format(UI_FOLDER))
+        self.HamburgerMenuBtn = tk.Button(master=self, highlightthickness = 0, relief=tk.FLAT, bd=0, command=self.toggleHamburgerMenu)
         
         # Heading
         self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Home", font = MENU_FONT)
@@ -125,12 +128,13 @@ class MainMenu(tk.Frame):
     
     # Removes all UI elements
     def clear(self):
-        self.darkModeToggle.place_forget()
         self.pageLabel.place_forget()
+        self.HamburgerMenuBtn.place_forget()
         self.APIKeyInput.place_forget()
         self.nextButton.place_forget()
         self.APIKeyLoad.place_forget()
         self.APIKeyRetrieve.place_forget()
+        self.darkModeToggle.place_forget()
 
     # Renders all UI Elements
     def draw(self):
@@ -139,23 +143,30 @@ class MainMenu(tk.Frame):
         self.config(bg=BGND_COL)
 
         # This is where elements are configured (Colours)
-        self.darkModeToggle.config(bg = BGND_COL, fg=BTN_COL)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.APIKeyHeading.config(bg = BGND_COL, fg = TEXT_COL)
         self.APIKeyInput.config(bg = TEXT_INPT_BG, fg = TEXT_INPT_FG)
         self.APIKeyLoad.config(bg= BGND_COL, fg=BTN_COL)
         self.APIKeyRetrieve.config(bg= BGND_COL, fg=BTN_COL)
+        self.darkModeToggle.config(bg = BGND_COL, fg=BTN_COL)
         self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
+        if(self.darkMode == 0):
+            self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerIconLight) 
+        else:
+            self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerIconDark)
+        # Swap image of Hamburger Icon
 
 
         # This is where elements are placed
-        self.darkModeToggle.place(x = WINDOW_WIDTH / 2 - 64, y = WINDOW_HEIGHT - 100)
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 36, y = HEADING_Y)
+        self.HamburgerMenuBtn.place(x=10, y=10)
         self.APIKeyHeading.place(x = WINDOW_WIDTH / 2 - 165, y = HEADING_Y + 70)
         self.APIKeyInput.place(x = WINDOW_WIDTH / 2 - 170, y = HEADING_Y + 100)
         self.APIKeyLoad.place(x = WINDOW_WIDTH / 2 - 100, y = HEADING_Y + 130)
         self.APIKeyRetrieve.place(x = WINDOW_WIDTH / 2 - 0, y = HEADING_Y + 130)
+        self.darkModeToggle.place(x = WINDOW_WIDTH / 2 - 64, y = WINDOW_HEIGHT - 100)
         self.nextButton.place(x = WINDOW_WIDTH - 50, y = WINDOW_HEIGHT - 50)
+
     
     def requestAPIKey(self, src=0):
         key = ""
@@ -217,7 +228,8 @@ class MainMenu(tk.Frame):
 
         print(self.controller.messageToMainFunc(0)) # Testing, will delete later
     
-    def toggleHamburgerMenu():
+    def toggleHamburgerMenu(self):
+        self.controller.showNavBar = not self.controller.showNavBar
         print("Hamburger Menu Toggled!")
 
 
