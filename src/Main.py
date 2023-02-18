@@ -10,7 +10,6 @@ import json
 import random
 import pickle # Used for serializing staff to files as well as converting serialized files to staff objects
 import threading
-import time
 
 # External deps
 import pyperclip
