@@ -87,10 +87,8 @@ def saveStaff():
 
 if __name__ == "__main__":
     
-    # Create the GUI Application window
+    # Create the GUI Application window and hand it the communication function so tht it can communicate with Main
     MainWindow = GUIHandler.RosterWindow(messageFromGUI)
-    # Set resolution of GUI Application window
-    MainWindow.geometry('{}x{}'.format(GUIHandler.WINDOW_WIDTH, GUIHandler.WINDOW_HEIGHT))
 
     # Update GUI and respond to User interations -- Can put other checks and logic in this loop if needed
     while True:

@@ -25,7 +25,8 @@ class RosterWindow(tk.Tk):
 
         self.messageToMainFunc = messageToMainFunc
         tk.Tk.__init__(self, *args, **kwargs)
-
+        
+        self.geometry('{}x{}'.format(WINDOW_WIDTH, WINDOW_HEIGHT)) # Set resolution of GUI Application window
         self.showNavBar = False # Hamburger menu toggle
         self.navBarWidth = 100 # Width of nav bar (pixels)
         self.navBarPosX = 10 # Distance from left-hand side that the start of the buttons will be place (pixels)
