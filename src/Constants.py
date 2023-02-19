@@ -12,6 +12,7 @@ STD_FONT = ('Helvetica bold', 11)
 NAV_BTN_FONT = ('Helvetica bold', 14)
 API_BTN_FONT = ('Helvetica bold', 13)
 DROP_DOWN_LABEL_FONT = ('Helvetica bold', 13)
+WARN_FONT = ('Helvetica bold', 13)
 
 # Colours definition
 BLACK = "#000000"
@@ -37,6 +38,7 @@ BTN_COL = WSU_ORANGE
 TEXT_INPT_BG = LIGHT_GREY
 TEXT_INPT_FG = DARK_GREY
 NAV_BAR_COL = LIGHT_GREY 
+NAV_BAR_SUBSECT_COL = MEDIUM_GREY
 
 # Macro Defintions
 SUCCESS = True

@@ -30,10 +30,12 @@ class RosterWindow(tk.Tk):
         self.showNavBar = False # Hamburger menu toggle
         self.navBarWidth = 100 # Width of nav bar (pixels)
         self.navBarPosX = 10 # Distance from left-hand side that the start of the buttons will be place (pixels)
-        self.navBarIncrementY = 60 # Distance between each navigation button in hamburger menu (pixels)
+        self.navBarIncrementY = 50 # Distance between each navigation button in hamburger menu (pixels)
+        self.navBarSubsectStartY = 450 # Start of admin section of navbar
         self.darkMode = 0 # Dark Mode Toggle
         self.EEM = 0 # Easter Egg mode: 0 = Deafult, 1 = Pink text/UI elements, 2 = Uwuify'd text/UI elements
-        self.activeFrame = None
+        self.activeFrame = None # Stores which frame is currently displayed to the user
+        self.prevFrame = None # Stores the frame that navigated to the current frame
 
         if("isabel" in os.getlogin().lower()): # Change to Isabel's staff number
             self.EEM = 1  # Isabel Detected
@@ -61,7 +63,7 @@ class RosterWindow(tk.Tk):
         # Create and fill dictionary of frames
         self.frames = {}
 
-        for menu in (MainMenu, ConfigurationMenu, LunchRosterMenu, ChatMenu, PendingsMenu, FinalizeMenu):
+        for menu in (MainMenu, ConfigurationMenu, LunchRosterMenu, ChatMenu, PendingsMenu, FinalizeMenu, StaffManagementMenu):
             frame = menu(container, self)
 
             self.frames[menu] = frame
@@ -75,7 +77,14 @@ class RosterWindow(tk.Tk):
     # Function to put the passed page as the toplevel page in container
     def show_frame(self, page):
         # Get requested frame from dict
-        frame = self.frames[page]
+        if(page == None):
+            # Requesting to go back to previous page
+            frame = self.prevFrame
+        else:
+            # Go to requested page
+            frame = self.frames[page]
+
+        self.prevFrame = self.activeFrame
         self.activeFrame = frame
 
         # If this is the first time the frame is loaded, run it's first time function
@@ -110,11 +119,13 @@ class MainMenu(tk.Frame):
         self.canvas = tk.Canvas(self, width = self.controller.navBarWidth, height = WINDOW_HEIGHT) # Used for hamburger menu shade
         # self.canvas becomes master of any buttons created on it
         self.navToMain = tk.Button(self.canvas, text="Home", relief=tk.FLAT, state=tk.DISABLED)
-        self.navToConfig = tk.Button(self.canvas, text="Configuration", relief=tk.FLAT, command=lambda:self.controller.show_frame(ConfigurationMenu))
         self.navToLunch = tk.Button(self.canvas, text="Lunch", relief=tk.FLAT, command=lambda:self.controller.show_frame(LunchRosterMenu))
         self.navToChat = tk.Button(self.canvas, text="Chats", relief=tk.FLAT, command=lambda:self.controller.show_frame(ChatMenu))
         self.navToPendings = tk.Button(self.canvas, text="Pendings", relief=tk.FLAT, command=lambda:self.controller.show_frame(PendingsMenu))
         self.navToFinal = tk.Button(self.canvas, text="Finalisation", relief=tk.FLAT, command=lambda:self.controller.show_frame(FinalizeMenu))
+        self.navBarAdmin = tk.Label(self.canvas, text = "Admin", font=HEADING_FONT)
+        self.navToConfig = tk.Button(self.canvas, text="Configuration", relief=tk.FLAT, command=lambda:self.controller.show_frame(ConfigurationMenu))
+        self.navToStaffManagement = tk.Button(self.canvas, text="Manage Staff", relief=tk.FLAT, command=lambda:self.controller.show_frame(StaffManagementMenu))
 
         # Hamburger Menu 
         self.hamburgerIconLight = tk.PhotoImage(file = "{}HamburgerLight.png".format(UI_FOLDER))
@@ -131,14 +142,14 @@ class MainMenu(tk.Frame):
         self.APIKeyLoad = CreateElement(controller, tk.Button, master=self, text = "File: Load", font=API_BTN_FONT, command=lambda:self.requestAPIKey(0))
         self.APIKeyRetrieve = CreateElement(controller, tk.Button, master=self, text = "Web: Retrieve", font=API_BTN_FONT, command=lambda:self.requestAPIKey(1))
         self.APICheck = CreateElement(controller, tk.Button, master=self, text="Check", font=API_BTN_FONT, command=self.checkAPIKey)
+        self.APICheckMessage = CreateElement(controller, tk.Label, master=self, font=WARN_FONT)
         # Add dark mode toggle
         self.darkModeToggle = CreateElement(controller, tk.Button, master=self, text="Enable dark mode", font=STD_FONT, command = self.toggleDarkMode)  
 
         # Navigation buttons
-        self.nextButton = CreateElement(controller, tk.Button, master=self, text=">", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(ConfigurationMenu) )
+        self.nextButton = CreateElement(controller, tk.Button, master=self, text=">", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(LunchRosterMenu) )
 
         
-
     def onFirstLoad(self):
         # Draw all UI elements to screen
         self.draw()
@@ -157,6 +168,8 @@ class MainMenu(tk.Frame):
         self.APIKeyRetrieve.place_forget()
         self.APICheck.place_forget()
         self.darkModeToggle.place_forget()
+        self.APICheckMessage.place_forget()
+        self.navBarAdmin.place_forget()
         
 
         self.canvas.delete("all") # Clear canvas 
@@ -175,29 +188,35 @@ class MainMenu(tk.Frame):
         self.APIKeyLoad.config(bg= BGND_COL, fg=BTN_COL)
         self.APIKeyRetrieve.config(bg= BGND_COL, fg=BTN_COL)
         self.APICheck.config(bg = BGND_COL, fg=BTN_COL)
+        self.APICheckMessage.config(bg = BGND_COL, fg=TEXT_COL)
         self.darkModeToggle.config(bg = BGND_COL, fg=BTN_COL)
         self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
 
 
         
-        # Handle Hamburger menu first as it is a special case and we want everythign to be drawn over top of it
+        # Handle Hamburger menu first as it is a special case and we want everything to be drawn over top of it
         if(self.controller.showNavBar):
             # Navbar Menu active
             self.canvas.config(bg=NAV_BAR_COL, highlightthickness = 0, relief=tk.FLAT, bd=0)
+            self.canvas.create_rectangle(0, 450, self.controller.navBarWidth, WINDOW_HEIGHT, fill=NAV_BAR_SUBSECT_COL)
             # Configuration of navBar buttons
             self.navToMain.config(bg = BGND_COL, fg=BTN_COL)
             self.navToConfig.config(bg = BGND_COL, fg=BTN_COL)
+            self.navToStaffManagement.config(bg = BGND_COL, fg=BTN_COL)
             self.navToLunch.config(bg = BGND_COL, fg=BTN_COL)
             self.navToChat.config(bg = BGND_COL, fg=BTN_COL)
             self.navToPendings.config(bg = BGND_COL, fg=BTN_COL)
             self.navToFinal.config(bg = BGND_COL, fg=BTN_COL)
+            self.navBarAdmin.config(bg=NAV_BAR_COL, fg=TEXT_COL)
             # Placement of Navbar buttons
             self.navToMain.place(x=self.controller.navBarPosX, y=20)
-            self.navToConfig.place(x=self.controller.navBarPosX, y=20 + self.controller.navBarIncrementY)
-            self.navToLunch.place(x=self.controller.navBarPosX, y=20 + 2 * self.controller.navBarIncrementY)
-            self.navToChat.place(x=self.controller.navBarPosX, y=20 + 3 * self.controller.navBarIncrementY)
-            self.navToPendings.place(x=self.controller.navBarPosX, y=20 + 4 * self.controller.navBarIncrementY)
-            self.navToFinal.place(x=self.controller.navBarPosX, y=20 + 5 * self.controller.navBarIncrementY)
+            self.navToConfig.place(x=self.controller.navBarPosX, y=20 + self.controller.navBarSubsectStartY)
+            self.navToStaffManagement.place(x=self.controller.navBarPosX, y= 20 + self.controller.navBarIncrementY + self.controller.navBarSubsectStartY)
+            self.navToLunch.place(x=self.controller.navBarPosX, y=20 + 1 * self.controller.navBarIncrementY)
+            self.navToChat.place(x=self.controller.navBarPosX, y=20 + 2 * self.controller.navBarIncrementY)
+            self.navToPendings.place(x=self.controller.navBarPosX, y=20 + 3 * self.controller.navBarIncrementY)
+            self.navToFinal.place(x=self.controller.navBarPosX, y=20 + 4 * self.controller.navBarIncrementY)
+            self.navBarAdmin.place(x = self.controller.navBarPosX, y = self.controller.navBarSubsectStartY - 30)
             self.canvas.place(x=0,y=0)
             # TODO: Set hamburgerMenuBtn image to an 'X'
             if(self.controller.darkMode == 0):
@@ -243,17 +262,23 @@ class MainMenu(tk.Frame):
         
         self.APIKeyInput.insert(tk.END, key) # Insert received API key
 
+    # Function that checks that sends the entered API Key to Main to check if it is valid
+    # Main then sends back SUCCESS or NOSUCCESS depending on if the key is valid
+    # This function displays the output of that
     def checkAPIKey(self):
         if(self.controller.messageToMainFunc(4, self.APIKeyInput.get(1.0, tk.END).replace('\n', "")) == NOSUCCESS):
-            messagebox.showerror("API Key Error", "API Key failed\n Please enter a valid Humanity API key") 
+            self.APICheckMessage.config(text="API Key: Error")
+            self.APICheckMessage.place(x = (WINDOW_WIDTH / 2 - 65) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 160 )
+            #messagebox.showerror("API Key Error", "API Key failed\n Please enter a valid Humanity API key") 
         else:
-            messagebox.showinfo("API Key Success", "API Key successful!") 
+            self.APICheckMessage.config(text="API Key: Success")
+            self.APICheckMessage.place(x = (WINDOW_WIDTH / 2 - 60) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 170 )
+            #messagebox.showinfo("API Key Success", "API Key successful!") 
 
 
-
-
+    # Function that toggles the state of dark mode by modifying colour 'constants' based on dark mode state
     def toggleDarkMode(self):
-        global BGND_COL, BTN_COL, TEXT_COL, TEXT_INPT_FG, TEXT_INPT_BG, NAV_BAR_COL
+        global BGND_COL, BTN_COL, TEXT_COL, TEXT_INPT_FG, TEXT_INPT_BG, NAV_BAR_COL, NAV_BAR_SUBSECT_COL
         self.controller.darkMode = not self.controller.darkMode # Flip dark mode toggle
 
         if(self.controller.EEM != 1):
@@ -266,6 +291,7 @@ class MainMenu(tk.Frame):
                 TEXT_INPT_BG = LIGHT_GREY
                 TEXT_INPT_FG = DARK_GREY
                 NAV_BAR_COL = LIGHT_GREY
+                NAV_BAR_SUBSECT_COL = MEDIUM_GREY
 
             else:
                 # Enable Dark Mode
@@ -274,7 +300,8 @@ class MainMenu(tk.Frame):
                 TEXT_COL = LIGHT_GREY
                 TEXT_INPT_BG = DARK_GREY
                 TEXT_INPT_FG = LIGHT_GREY
-                NAV_BAR_COL = DARK_SLATE_BLUE # Dark Slate Blue? 
+                NAV_BAR_COL = DARK_SLATE_BLUE  
+                NAV_BAR_SUBSECT_COL = WSU_BLACK
         else:
             # Isabel mode
             if(self.controller.darkMode == 0): 
@@ -299,77 +326,6 @@ class MainMenu(tk.Frame):
         self.draw()  # Redraw all elements using new colour scheme
 
         print(self.controller.messageToMainFunc(0)) # Testing, will delete later
-    
-
-
-class ConfigurationMenu(tk.Frame):
-    
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        
-        self.parent = parent # Reference to parent container
-        self.controller = controller # Reference to parent object
-        self.firstLoad = True # Flag for first time loading of page
-        
-        # Set background colour
-        self.config(bg=BGND_COL)
-
-        # Heading
-        self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Configuration", font = MENU_FONT) 
-
-        # Hamburger Menu buton
-        self.hamburgerIconLight = tk.PhotoImage(file = "{}HamburgerLight.png".format(UI_FOLDER))
-        self.hamburgerIconDark = tk.PhotoImage(file = "{}HamburgerDark.png".format(UI_FOLDER))
-        self.HamburgerMenuBtn = tk.Button(master=self, highlightthickness = 0, relief=tk.FLAT, bd=0, command=self.controller.toggleHamburgerMenu)
-
-        # Description of page use
-        self.pageDescriptor = CreateElement(controller, tk.Label, master=self, text="Enter any exceptions to regular rostering here", font=HEADING_FONT)
-
-        # Navigation buttons
-        self.nextButton = CreateElement(controller, tk.Button, master=self, text=">", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(LunchRosterMenu) )
-        self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(MainMenu))
-        
-
-    
-    def onFirstLoad(self):
-
-        # Draw all UI elements to screen
-        self.draw()
-        self.firstLoad = False
-        
-
-
-    # Removes all UI elements
-    def clear(self):
-        self.pageLabel.place_forget()
-        self.pageDescriptor.place_forget()
-        self.nextButton.place_forget()
-        self.prevButton.place_forget()
-
-
-    # Renders all UI Elements
-    def draw(self):
-
-        self.config(bg=BGND_COL)
-
-        # This is where elements are configured (Colours)
-        self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.pageDescriptor.config(bg=BGND_COL, fg=TEXT_COL)
-        self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
-
-        if(self.controller.darkMode == 0):
-            self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerIconLight) 
-        else:
-            self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerIconDark)
-
-        # This is where elements are placed
-        self.pageLabel.place(x = WINDOW_WIDTH / 2 - 80, y = HEADING_Y)
-        self.pageDescriptor.place(x = WINDOW_WIDTH / 2 - 190, y = HEADING_Y + 30)
-        self.nextButton.place(x = WINDOW_WIDTH - 50, y = WINDOW_HEIGHT - 50)
-        self.prevButton.place(x = 20, y = WINDOW_HEIGHT - 50)
-        
-
 
 
 
@@ -420,7 +376,7 @@ class LunchRosterMenu(tk.Frame):
 
         # Navigation buttons
         self.nextButton = CreateElement(controller, tk.Button, master=self, text=">", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(ChatMenu) )
-        self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(ConfigurationMenu))
+        self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(MainMenu))
 
 
 
@@ -630,6 +586,7 @@ class PendingsMenu(tk.Frame):
         self.nextButton.place(x = WINDOW_WIDTH - 50, y = WINDOW_HEIGHT - 50)
         self.prevButton.place(x = 20, y = WINDOW_HEIGHT - 50)
 
+
 class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
 
     def __init__(self, parent, controller):
@@ -642,17 +599,18 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         # Set background colour
         self.config(bg=BGND_COL)
 
-        # Heading
-        self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Finalisation", font = MENU_FONT) #tk.Label(self, text="Home Page", font = STD_FONT, fg = controller.fontCol) 
-
-        # Hamburger Menu buton
+        # Hamburger Menu button
         self.hamburgerIconLight = tk.PhotoImage(file = "{}HamburgerLight.png".format(UI_FOLDER))
         self.hamburgerIconDark = tk.PhotoImage(file = "{}HamburgerDark.png".format(UI_FOLDER))
         self.HamburgerMenuBtn = tk.Button(master=self, highlightthickness = 0, relief=tk.FLAT, bd=0, command=self.controller.toggleHamburgerMenu)
 
+
+        # Heading
+        self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Finalisation", font = MENU_FONT) #tk.Label(self, text="Home Page", font = STD_FONT, fg = controller.fontCol) 
+
         # Navigation buttons
         self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(PendingsMenu))
-
+        
     
     def onFirstLoad(self):
         # Draw all UI elements to screen
@@ -685,6 +643,108 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
         self.prevButton.place(x = 20, y = WINDOW_HEIGHT - 50)
+
+
+
+class ConfigurationMenu(tk.Frame):
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        
+        self.parent = parent # Reference to parent container
+        self.controller = controller # Reference to parent object
+        self.firstLoad = True # Flag for first time loading of page
+        
+        # Set background colour
+        self.config(bg=BGND_COL)
+
+        # Heading
+        self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Configuration", font = MENU_FONT) 
+
+        # Description of page use
+        self.pageDescriptor = CreateElement(controller, tk.Label, master=self, text="Enter any exceptions to regular rostering here", font=HEADING_FONT)
+
+        # Prev page button
+        self.closeButton = CreateElement(controller, tk.Button, master=self, text="X", font = MENU_FONT, width=2, command = lambda:controller.show_frame(None))
+
+    
+    def onFirstLoad(self):
+
+        # Draw all UI elements to screen
+        self.draw()
+        self.firstLoad = False
+        
+
+
+    # Removes all UI elements
+    def clear(self):
+        self.pageLabel.place_forget()
+        self.pageDescriptor.place_forget()
+        self.closeButton.place_forget()
+
+
+    # Renders all UI Elements
+    def draw(self):
+
+        self.config(bg=BGND_COL)
+
+        # This is where elements are configured (Colours)
+        self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
+        self.pageDescriptor.config(bg=BGND_COL, fg=TEXT_COL)
+        self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
+        
+
+        # This is where elements are placed
+        self.pageLabel.place(x = WINDOW_WIDTH / 2 - 80, y = HEADING_Y)
+        self.pageDescriptor.place(x = WINDOW_WIDTH / 2 - 190, y = HEADING_Y + 30)
+        self.closeButton.place(x = 20, y = 20)
+
+
+class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        
+        self.parent = parent # Reference to parent container
+        self.controller = controller # Reference to parent object
+        self.firstLoad = True # Flag for first time loading of page
+
+        # Set background colour
+        self.config(bg=BGND_COL)
+
+        # Heading
+        self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Staff Management", font = MENU_FONT) 
+
+        # Prev page button
+        self.closeButton = CreateElement(controller, tk.Button, master=self, text="X", font = MENU_FONT, width=2, command = lambda:controller.show_frame(None))
+
+    
+    def onFirstLoad(self):
+        # Draw all UI elements to screen
+        self.draw()
+
+        self.firstLoad = False
+        pass
+
+
+    # Removes all UI elements
+    def clear(self):
+        self.pageLabel.place_forget()
+        self.closeButton.place_forget()
+
+
+    # Renders all UI Elements
+    def draw(self):
+
+        self.config(bg=BGND_COL)
+
+        # This is where elements are configured (Colours)
+        self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
+        self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
+
+        # This is where elements are placed
+        self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
+        self.closeButton.place(x = 20, y = 20)
 
 
 
