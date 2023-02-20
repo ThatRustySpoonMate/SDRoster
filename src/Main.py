@@ -51,11 +51,7 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = "API Key From Web"
         
     elif(reqType == 2): # Placeholder values to show logic flow
-        reply = {
-            "Ethan":"11:30",
-            "Isaac":"12:00",
-            "Jack":"23:00"
-        }
+        reply = { "Ethan":"11:30", "Isaac":"12:00", "Jack":"23:00" }
         
     elif(reqType == 3):
         # Update the staff member's lunch time in the staff member object
