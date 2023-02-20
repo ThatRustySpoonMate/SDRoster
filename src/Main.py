@@ -73,9 +73,19 @@ def messageFromGUI(reqType, reqParam = 0):
         reply = PendingsRosterGenerator.generatePendingsRoster()
     
     elif(reqType == 7): # Change assigned chats
-        reply = GUIHandler.SUCCESS
+        try:
+            # Update the staff member's chat status in their staff member object
+            staffName = reqParam[0]
+            chatFlag = reqParam[1]
+            workingStaff[staffName].on_chat = chatFlag
+            # If successful
+            reply = GUIHandler.SUCCESS
+        except Exception as exc:
+            #If unsuccessful
+            reply = GUIHandler.NOSUCCESS
     
     elif(reqType == 8): # Change assigned pendings
+        # Update the staff member's pending time in their staff member object
         reply = GUIHandler.SUCCESS
         
         
