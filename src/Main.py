@@ -1,7 +1,7 @@
 # Local deps
 from Normies import WSUStaff # Defines WSU Staff class
 from DataCollectors import * # Reading data from text files
-import GUIHandler 
+import GUIHandler, LunchRosterGenerator, ChatRosterGenerator, PendingsRosterGenerator
 
 # Python bundled deps
 import webbrowser
