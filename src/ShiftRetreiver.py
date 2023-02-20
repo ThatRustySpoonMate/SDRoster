@@ -28,14 +28,15 @@ shift_types = {"Casual - SD", "Full Time - SD", "Senior Queue Escalation - SD", 
 #				[0] - Full Name "Joe Blow"
 #				[1] - Shift start time - %Y-%m-%d%I:%M%p format
 #				[2] - Shift End time - %Y-%m-%d%I:%M%p format
-def get_shift_data():
+def get_shift_data(api_token = ""):
 	# Gets the current date and formats into a string to be used in API call
 	# Formats a datetime object into a string, format is year-month-day i.e 2022-06-25
 	today_date = datetime.today().strftime('%Y-%m-%d')
 
 	# @TODO load token file correctly, below lines are temporary
-	api_token_file = open('tokenFile.txt') # place holder file opening
-	api_token = api_token_file.read() 
+	if(api_token != ""):
+		api_token_file = open('tokenFile.txt') # place holder file opening
+		api_token = api_token_file.read() 
 
 	request_url = "https://www.humanity.com/api/v2/shifts?start_date=" + today_date + "&end_date=" + today_date + "&access_token=" + api_token
 
@@ -75,6 +76,7 @@ def get_shift_data():
 		api_error_data = api_response.json()
 		print(api_error_data['data']) # prints general error message
 		print(api_error_data['error']) # print specific hint error
+		return False
 		
 
 
@@ -107,7 +109,7 @@ def trim_data(raw_shift_data, today_date):
 
 	return shifts
 
-if __name__ == "__main__" :
-    return_val = get_shift_data()
+#if __name__ == "__main__" :
+#    return_val = get_shift_data()
 		
 		

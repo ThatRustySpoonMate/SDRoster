@@ -1,4 +1,5 @@
 #TODO: Define function 
+import datetime
 
 def generateChatRoster():
-    return None
+    return { "Ethan":False, "Isaac":True, "Jack":False }
