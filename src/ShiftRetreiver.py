@@ -1,10 +1,5 @@
-from datetime import datetime
 import requests
-
-# The types of shifts that can be assigned in humanity
-#@TODO decouple from being hardcoded, if new shift types are introduced, currently the source code will
-# need to be edited, this should be adjustable in the GUI
-shift_types = {"Casual - SD", "Full Time - SD", "Senior Queue Escalation - SD", "Senior Queue Calls - SD", "Extended Hours Support - SD"}
+from datetime import datetime, timedelta
 
 # This file is used for calling Humanity's API, GET Shifts
 # link to API reference: https://platform.humanity.com/reference/get-shifts
@@ -28,16 +23,16 @@ shift_types = {"Casual - SD", "Full Time - SD", "Senior Queue Escalation - SD", 
 #				[0] - Full Name "Joe Blow"
 #				[1] - Shift start time - %Y-%m-%d%I:%M%p format
 #				[2] - Shift End time - %Y-%m-%d%I:%M%p format
-def get_shift_data():
+def get_shift_data(shift_types, date):
 	# Gets the current date and formats into a string to be used in API call
 	# Formats a datetime object into a string, format is year-month-day i.e 2022-06-25
-	today_date = datetime.today().strftime('%Y-%m-%d')
+	selected_date = date.strftime('%Y-%m-%d')
 
 	# @TODO load token file correctly, below lines are temporary
 	api_token_file = open('tokenFile.txt') # place holder file opening
 	api_token = api_token_file.read() 
 
-	request_url = "https://www.humanity.com/api/v2/shifts?start_date=" + today_date + "&end_date=" + today_date + "&access_token=" + api_token
+	request_url = "https://www.humanity.com/api/v2/shifts?start_date=" + selected_date + "&end_date=" + selected_date + "&access_token=" +  api_token
 
 	# URL for testing
 	# request_url = "https://www.humanity.com/api/v2/shifts?start_date=asfasf" + "&end_date=" + "2023-02-17" + "&access_token=" + api_token
@@ -56,12 +51,11 @@ def get_shift_data():
 
 		# returned without errors
 		if api_response.status_code == 200:
-			formatted_shift_data = trim_data(raw_shift_data, today_date)
+			formatted_shift_data = trim_data(raw_shift_data, selected_date, shift_types)
 
 			if not formatted_shift_data:
 				print("No shifts after formatting raw shift data")
 			else:
-				print(formatted_shift_data)
 				return formatted_shift_data
 		else: # returns with errors
 			#@TODO proper GUI feedback
@@ -76,17 +70,14 @@ def get_shift_data():
 		print(api_error_data['data']) # prints general error message
 		print(api_error_data['error']) # print specific hint error
 		
-
-
-
 # This function takes in a response and removes data note required for the roster generator
 #	shift_list - Raw response data from API call, should be in the form of an object array
-#	today_date - datetime object containing the current day
+#	selected_date - datetime object containing the current day
 # 	Return value - array of shift objects that contain:
 #				[0] - Full Name "Joe Blow"
 #				[1] - Shift start time - %Y-%m-%d%I:%M%p format
 #				[2] - Shift End time - %Y-%m-%d%I:%M%p format
-def trim_data(raw_shift_data, today_date):
+def trim_data(raw_shift_data, selected_date, shift_types):
 	shifts = []
 
 	# iterate through all the raw shift data
@@ -97,8 +88,8 @@ def trim_data(raw_shift_data, today_date):
 			
 			# get the length of the shift, as well as the start and end times
 			shift_length = item['length']
-			start_time = datetime.strptime(today_date + item['start_date']['time'], "%Y-%m-%d%I:%M%p") # datetime object
-			end_time = datetime.strptime(today_date + item['end_date']['time'], "%Y-%m-%d%I:%M%p") # datetime object
+			start_time = datetime.strptime(selected_date + item['start_date']['time'], "%Y-%m-%d%I:%M%p") # datetime object
+			end_time = datetime.strptime(selected_date + item['end_date']['time'], "%Y-%m-%d%I:%M%p") # datetime object
 
 			# iterate through items, creating a shift for an employee
 			for employee in item['employees']:
@@ -106,8 +97,3 @@ def trim_data(raw_shift_data, today_date):
 				shifts.append(employee_shift)
 
 	return shifts
-
-if __name__ == "__main__" :
-    return_val = get_shift_data()
-		
-		
