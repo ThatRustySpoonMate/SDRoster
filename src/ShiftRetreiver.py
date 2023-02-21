@@ -92,8 +92,10 @@ def trim_data(raw_shift_data, selected_date, shift_types):
 			end_time = datetime.strptime(selected_date + item['end_date']['time'], "%Y-%m-%d%I:%M%p") # datetime object
 
 			# iterate through items, creating a shift for an employee
+			# staff with shifts of less than 5 hours are not added to the roster
 			for employee in item['employees']:
 				employee_shift = [employee['name'], start_time, end_time, shift_length]
-				shifts.append(employee_shift)
+				if shift_length >= 5:
+					shifts.append(employee_shift)
 
 	return shifts

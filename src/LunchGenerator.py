@@ -1,11 +1,23 @@
 from datetime import datetime, timedelta
 from ShiftRetreiver import  get_shift_data
 
-def GetLunchSlots(weighted_times, time_weights, lunches_start, lunches_end, num_staff):
-	# Define the key times as datetime objects
-	key_times = weighted_times
-	key_weights = time_weights
+# This function creates a dsitribution of lunch times across a designated timeframe
+# The times are distributed by weight, with certain times being more preferrable
+# Times between key times are assigned a weight that is interpolated between adjacent key time
+#	time_weight_dict - dictionary of times, and their associated weights. Key should be a datetime object
+#	lunches_start - when lunches are elligible to be assigned from
+#	lunches_end - the last available timeslot a lunch can be assigned
+#	num_staff - number of staff to be assigned
+def GetLunchSlots(time_weights_dict, lunches_start, lunches_end, num_staff):
+	
+	# split dictionary into lists of keys and values
+	# need to be in lists so they can be iterated through when interpolating weights
+	key_times = list(time_weights_dict.key)
+	key_weights = list(time_weights_dict.value)
 
+	# If no key times are available, it will default to an even distribution, slightly favouring the morning
+	# due to the way shifts are handed out, thre may be an additional shift appended at the end
+	# to avoid this, the end time should be a lower weighting
 	if key_times is None:
 		key_times = [
 			lunches_start,
@@ -13,6 +25,7 @@ def GetLunchSlots(weighted_times, time_weights, lunches_start, lunches_end, num_
 		]
 		key_weights = [1,1]
 	else:
+		# if the first and last key time are not equal to the start or end of lunch, the it will assign default values
 		if (key_times[0] != lunches_start):
 			key_times.insert(0, lunches_start)
 			key_weights.insert(0, 1)		
@@ -66,20 +79,30 @@ def GetLunchSlots(weighted_times, time_weights, lunches_start, lunches_end, num_
 		value -= values[i]
 		total_weight -= weight
 
-	results = {}
+	# create a dictionary of available times and the number of slots associated with them
+	avilable_slots = {}
 
 	for slot in range(num_slots):
 		current_time = key_times[0] + slot * time_step
-		results[current_time] = values[slot]
+		avilable_slots[current_time] = values[slot]
 
-	return results
+	return avilable_slots
 
-def GetStaffLunches(lunchslots, list_of_staff):
+# This function assigns users to a lunch time
+# @TODO expand functionality, currently is first come first serve, early staff are assigned earlier lunches
+# Implemting preferred lunches
+#	lunch_slots - disctionary of lunch times and their free slots
+#	list_of_staff - list of staff to be rostered
+def GetStaffLunches(lunch_slots, list_of_staff):
 	staff_list = list_of_staff
-	lunch_dict = lunchslots
+	lunch_dict = lunch_slots
 	lunch_times = list(lunch_dict.keys())
 	staff_lunches = {}
 
+	# iterates through the staff and lunch slots
+	# if a lunch time has no free slots, it is removed from the list
+	# first item of list is always accessed, as it will be the next earliest lunch time
+	# after assigning someone to that time, the number of free slots is decreased
 	for staff in staff_list:
 		while lunch_dict[lunch_times[0]] == 0:
 			del lunch_times[0]
