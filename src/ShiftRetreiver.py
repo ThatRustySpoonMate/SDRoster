@@ -24,6 +24,8 @@ from datetime import datetime, timedelta
 #				[1] - Shift start time - %Y-%m-%d%I:%M%p format
 #				[2] - Shift End time - %Y-%m-%d%I:%M%p format
 
+
+# TODO: Also return true or false depending on API key validity
 def get_shift_data(shift_types, date, api_token = ""):
 
 	# Gets the current date and formats into a string to be used in API call
@@ -31,7 +33,7 @@ def get_shift_data(shift_types, date, api_token = ""):
 	selected_date = date.strftime('%Y-%m-%d')
 
 	# @TODO load token file correctly, below lines are temporary
-	if(api_token != ""):
+	if(api_token == ""):
 		api_token_file = open('tokenFile.txt') # place holder file opening
 		api_token = api_token_file.read() 
 

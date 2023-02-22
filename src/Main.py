@@ -1,5 +1,6 @@
 # Local deps
 from Normies import ITSDStaff # Defines WSU Staff class
+from FormattingFunctions import *
 import ConfigInterface # Reading data from text files
 import GUIHandler, LunchGenerator, ChatRosterGenerator, PendingsRosterGenerator, APIKeyRetriever
 import ShiftRetreiver
@@ -8,15 +9,12 @@ import ShiftRetreiver
 from datetime import datetime, timedelta
 import json
 import random
-import pickle # Used for serializing staff to files as well as converting serialized files to staff objects
 import threading
 
 # External deps
 import pyperclip
 import win32com.client
 import requests
-
-workingStaff = {} # Dict of all staff names and their staff object, mainly accessed via messageFromGUI function e.g. {ethan: ethanObj,...}
 
 """
 ' This fuction is called by the GUI to send data to Main (e.g. a request for staff roster details). 
@@ -38,6 +36,8 @@ workingStaff = {} # Dict of all staff names and their staff object, mainly acces
         apiKey <string>
 """
 def messageFromGUI(reqType, reqParam = 0):
+    global ShiftData, ShiftDataTrimmed
+
     reply = ""
     print("Main received Request {} from GUI ".format( (reqType, reqParam) )) # Debug option
 
@@ -48,14 +48,14 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = APIKeyRetriever.retrieveFromWeb()
         
     elif(reqType == 2): # Request for lunch roster output
-        reply = LunchGenerator.GetLunchSlots()
+        reply = LunchGenerator.GetLunchSlots(LunchWeightsDict, LunchStart, LunchEnd)
         
     elif(reqType == 3): # Change assigned lunch
         try:
             # Update the staff member's lunch time in their staff member object
             staffName = reqParam[0]
             lunchTime = reqParam[1]
-            workingStaff[staffName].set_lunchtime = lunchTime
+            StaffToday[staffName].set_lunchtime = lunchTime # Update
             # If successful
             reply = GUIHandler.SUCCESS
         except Exception as exc:
@@ -63,6 +63,17 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = GUIHandler.NOSUCCESS
     
     elif(reqType == 4): # Requesting to check provided API Key
+        print(ShiftTypes) # REMOVE
+        # Get staff working today
+        ShiftData = ShiftRetreiver.get_shift_data(ShiftTypes, RosterDate, reqParam) # GetShiftData function needs to also return true or false if API key is valid
+        print("CHECK THIS: {}".format(ShiftData)) # REMOVE
+
+        ShiftDataTrimmed = ShiftRetreiver.trim_data(ShiftData, RosterDate, ShiftTypes)
+        print("CHECK THIS trimmed: {}".format(ShiftDataTrimmed)) # REMOVE
+
+        # Load in staff objects
+
+
         # If successful, save it to tokenFile and load in staff objects using the token
         return (GUIHandler.NOSUCCESS, "Error message here")
     
@@ -77,7 +88,7 @@ def messageFromGUI(reqType, reqParam = 0):
             # Update the staff member's chat status in their staff member object
             staffName = reqParam[0]
             chatFlag = reqParam[1]
-            workingStaff[staffName].on_chat = chatFlag
+            StaffToday[staffName].on_chat = chatFlag
             # If successful
             reply = GUIHandler.SUCCESS
         except Exception as exc:
@@ -92,23 +103,25 @@ def messageFromGUI(reqType, reqParam = 0):
     print("Returning {}".format(reply))
     return reply
 
-def loadStaff():
-    # Load only staff that are working today
-    return
 
-def saveStaff():
-    # If file does not exist for staff member, create it
-    return
-
-
-#LunchWeights = 
 
 if __name__ == "__main__":
 
-    # Load in data
+    # Load in config data
+    LunchStart = ConfigInterface.readValue("lunchStart")
+    LunchEnd = ConfigInterface.readValue("lunchEnd")
+    LunchWeights = ConfigInterface.readValue("lunchWeights").split(",")
+    LunchSlotTimes = ConfigInterface.readValue("lunchSlotTimes").split(",")
+    ShiftTypes = ConfigInterface.readValue("shiftTypes").split(",")
 
-    # Get staff working today
-    ShiftRetreiver.get_shift_data()
+    RosterDate = datetime.today() # Date that the roster will be generated for
+    LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
+    ShiftData = [] # Return from get_shift_data function
+    ShiftDataTrimmed = [] # Return from trim_data function
+    StaffToday = {} # Array of all the objects corresponding to staff that are working today, key is staffname, value is object
+
+    
+
     
     # Create the GUI Application window and hand it the communication function so tht it can communicate with Main
     MainWindow = GUIHandler.RosterWindow(messageFromGUI)

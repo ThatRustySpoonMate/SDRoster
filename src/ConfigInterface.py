@@ -1,5 +1,7 @@
 # TODO: Write functions that interface with serialised data files
 import os 
+
+DELIMITER = "#"
 configFP = "{}\\config\\config.txt".format(os.getcwd())
 
 # Function for reading the value of a key from the config file
@@ -9,28 +11,40 @@ def readValue(configItem):
 
     with open(configFP, "r") as configFile:
         while configItem not in output:
-            output = configFile.readline()
-            print(output)
+            output = configFile.readline().replace("\n", "") # Continue reading line-by-line
             if(output == "--end--"):
                 return None
                 
-        output = output.split("#")[1]
+        output = output.split(DELIMITER)[1]
 
     return output
 
 # Function for writing the value of a key to the config file
 def writeValue(configItem, value):
+    successful = False
 
-    with open(configFP, "r") as configFile:
-        fileContents = configFile.readlines()
-        configFile.writelines() # look into recording the line that needs to be changed and only changing that line instead of reading and writing the whole file contents
-        print(fileContents)
-        pass
+    with open(configFP, "r+") as configFile:
+        fileContents = configFile.readlines() # Read file contents as an array 
 
-    return
+        # Loop through all lines in the array
+        iter = 0
+        for iter in range(0, len(fileContents)):
+
+            # Locate string to change 
+            if fileContents[iter].split(DELIMITER)[0] == configItem:
+                fileContents[iter] = fileContents[iter][:len(configItem)+1] + value + "\n" # Overwrite the value for the given key
+                successful = True
+            iter += 1 
+
+        
+    with open(configFP, "w") as configFile2: # Opens file in writing mode and clears the contents
+        configFile2.writelines(fileContents) # Write the new array back to the file
+    
+    return successful
 
 
 if __name__ == "__main__":
     # Example uses
     #print(readValue("lunchStart"))
-    writeValue("lunchStart", "12:00")
+    #print(writeValue("lunchStart", "11:00"))
+    pass

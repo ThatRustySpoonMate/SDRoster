@@ -1,6 +1,6 @@
-lunchWeights1#2,1,3,1,2
-lunchWeights2#1,1,1,1,1
+lunchWeights#2,1,3,1,2
 lunchStart#11:00
 lunchEnd#15:00
-
+lunchSlotTimes#11:00,12:00,13:00,14:00,15:00
+shiftTypes#Casual - SD,Full Time - SD,Senior Queue Escalation - SD,Senior Queue Calls - SD,Extended Hours Support - SD
 --end--
