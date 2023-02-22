@@ -46,8 +46,16 @@ NOSUCCESS = False
 
 
 # Folder Paths
-UI_FOLDER = "{}\\SDRoster\\UI\\".format(os.getcwd())
-DATA_FOLDER = "{}\\SDRoster\\data\\".format(os.getcwd())
-SRC_FOLDER = "{}\\SDRoster\\src\\".format(os.getcwd())
-CNFG_FOLDER = "{}\\SDRoster\\config\\".format(os.getcwd())
+UI_FOLDER = "{}\\UI\\".format(os.getcwd())
+DATA_FOLDER = "{}\\data\\".format(os.getcwd())
+SRC_FOLDER = "{}\\src\\".format(os.getcwd())
+CNFG_FOLDER = "{}\\config\\".format(os.getcwd())
+
+
+# Placement of dynamic content on lunch/chat/pendings pages
+staffDisplayCol0 = 125 # Starting X position of col0 staff lunch
+staffDisplayCol1 = WINDOW_WIDTH / 2 + staffDisplayCol0 # Starting X position of col1 staff lunch
+staffDisplayStartY = 100 # Starting Y position of col0 row0 staff lunch
+staffDisplayIncrementY = 50 # Gap between each row of staff lunches 
+staffDisplayDrpDwnOffset = 0 # Gap between start of staff name and start of drop-down selector
 

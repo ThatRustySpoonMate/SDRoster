@@ -23,14 +23,17 @@ from datetime import datetime, timedelta
 #				[0] - Full Name "Joe Blow"
 #				[1] - Shift start time - %Y-%m-%d%I:%M%p format
 #				[2] - Shift End time - %Y-%m-%d%I:%M%p format
-def get_shift_data(shift_types, date):
+
+def get_shift_data(shift_types, date, api_token = ""):
+
 	# Gets the current date and formats into a string to be used in API call
 	# Formats a datetime object into a string, format is year-month-day i.e 2022-06-25
 	selected_date = date.strftime('%Y-%m-%d')
 
 	# @TODO load token file correctly, below lines are temporary
-	api_token_file = open('tokenFile.txt') # place holder file opening
-	api_token = api_token_file.read() 
+	if(api_token != ""):
+		api_token_file = open('tokenFile.txt') # place holder file opening
+		api_token = api_token_file.read() 
 
 	request_url = "https://www.humanity.com/api/v2/shifts?start_date=" + selected_date + "&end_date=" + selected_date + "&access_token=" +  api_token
 
@@ -69,6 +72,7 @@ def get_shift_data(shift_types, date):
 		api_error_data = api_response.json()
 		print(api_error_data['data']) # prints general error message
 		print(api_error_data['error']) # print specific hint error
+		return False
 		
 # This function takes in a response and removes data note required for the roster generator
 #	shift_list - Raw response data from API call, should be in the form of an object array
@@ -98,4 +102,8 @@ def trim_data(raw_shift_data, selected_date, shift_types):
 				if shift_length >= 5:
 					shifts.append(employee_shift)
 
+
 	return shifts
+
+#if __name__ == "__main__" :
+#    return_val = get_shift_data()
