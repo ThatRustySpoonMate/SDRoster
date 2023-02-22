@@ -1,7 +1,7 @@
 # Local deps
 from Normies import ITSDStaff # Defines WSU Staff class
-from DataCollectors import * # Reading data from text files
-import GUIHandler, LunchRosterGenerator, ChatRosterGenerator, PendingsRosterGenerator, APIKeyRetriever
+import ConfigInterface # Reading data from text files
+import GUIHandler, LunchGenerator, ChatRosterGenerator, PendingsRosterGenerator, APIKeyRetriever
 import ShiftRetreiver
 
 # Python bundled deps
@@ -48,7 +48,7 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = APIKeyRetriever.retrieveFromWeb()
         
     elif(reqType == 2): # Request for lunch roster output
-        reply = LunchRosterGenerator.generateLunchRoster()
+        reply = LunchGenerator.GetLunchSlots()
         
     elif(reqType == 3): # Change assigned lunch
         try:
@@ -101,8 +101,11 @@ def saveStaff():
     return
 
 
+#LunchWeights = 
 
 if __name__ == "__main__":
+
+    # Load in data
 
     # Get staff working today
     ShiftRetreiver.get_shift_data()
