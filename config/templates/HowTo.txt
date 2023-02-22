@@ -1,0 +1,8 @@
+-- Don't edit the files in this directory unless you know what you are doing. 
+-- If anything goes wrong with the main config text file, you can replace it 
+-- with the template file to restore the default settings. 
+-- When replacing the main config text file, make sure to rename it to remove the '_template'
+
+
+
+
