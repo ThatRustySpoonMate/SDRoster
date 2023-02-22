@@ -12,18 +12,20 @@
 # set_lunchtime 	- this is the set lunch time for an employee, this can be due to an agreed upon situation, or an agreed upon standard lunch time
 
 class ITSDStaff():
-	def __init__(self, full_name, chat_weight, chat_competency, pending_competency, on_chat, set_lunchtime):
+	def __init__(self, full_name, chat_weight, chat_competency, pending_competency, on_chat, preferred_lunchtime, actual_lunchtime):
 		self.full_name = full_name
 		self.chat_weight = chat_weight
 		self.chat_competency = chat_competency
 		self.pending_competency = pending_competency
 		self.on_chat = on_chat
-		self.set_lunchtime = set_lunchtime
+		self.chat_priority = False
+		self.preferred_lunchtime = preferred_lunchtime
+		self.actual_lunchtime = actual_lunchtime
 	
 	# increments chat weight proportional to the employee's chat competency so that more experienced people are more likely to be on chat
 	# this should be called whenever the employee is not assigned to chat
 	# chat weighting used to more evenly distribute chat, as employees chance of being on chat increases as chat_weight increases
-	# @TODO implement more robust chat weighting increment
+	# @TODO implement more robust chat weighting increment?
 	def increment_chat_weight(self):
 		self.chat_weight += self.chat_competency
 
