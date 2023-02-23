@@ -24,6 +24,7 @@ TURQUOISE = "#30D5C8"
 LIGHT_GREY = "#bebebe"
 MEDIUM_GREY = "#7D7F7C"
 DARK_SLATE_BLUE = "#06394f"
+CHEESE_YELLOW = "#ffa600"
 
 # WSU Colours definition
 WSU_CRIMSON = "#990033"

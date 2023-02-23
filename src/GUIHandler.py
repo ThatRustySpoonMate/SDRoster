@@ -4,6 +4,7 @@ from Normies import ITSDStaff
 import random, datetime
 from Constants import *
 from functools import partial # This is pure magic
+import sys
 
 # TODO: Expand GUI
 
@@ -37,8 +38,19 @@ class RosterWindow(tk.Tk):
         self.activeFrame = None # Stores which frame is currently displayed to the user
         self.prevFrame = None # Stores the frame that navigated to the current frame
 
-        if("isabel" in os.getlogin().lower()): # Change to Isabel's staff number
-            self.EEM = 1  # Isabel Detected
+        if("30060060" in os.getlogin().lower()): 
+            # Isabel Detected
+            self.EEM = 1  
+        elif("90954999" in os.getlogin().lower()): 
+             # Sean Maclean detected
+            if(random.randrange(0, 3) != 2):
+                #66% of time
+                messagebox.showwarning("!!CONTRACTOR DETECTED!!", "Contractor detected!\nProgram will self-destruct in t-10 seconds to protect the cheese.")
+                self.after(10000, self.destroy)
+            else:
+                # 33% of time
+                self.after(250, self.drawCheese)
+
         elif(random.randrange(0, 30) == 23):
             self.EEM = 2  # UWU Mode
 
@@ -107,6 +119,12 @@ class RosterWindow(tk.Tk):
         print("Hamburger Menu status: {}".format(self.showNavBar))
 
 
+    def drawCheese(self):
+        tempCheese = tk.Label(self.activeFrame, text = "cheese", font = ('Helvetica bold', 9), bg=CHEESE_YELLOW)
+        tempCheese.place( x = random.randrange(0, WINDOW_WIDTH) , y = random.randrange(0, WINDOW_HEIGHT) )
+        self.after(400, self.drawCheese)
+
+
 
 class MainMenu(tk.Frame):
 
@@ -157,6 +175,7 @@ class MainMenu(tk.Frame):
         
     def onFirstLoad(self):
         # Draw all UI elements to screen
+
         self.draw()
 
         self.firstLoad = False
@@ -485,7 +504,7 @@ class LunchRosterMenu(tk.Frame):
         hr = int(newTime.split(":")[0][:2])
         min = int(newTime.split(":")[1][:2])
 
-        if("pm" in newTime.lower()):
+        if("pm" in newTime.lower() and hr != 12):
             hr += 12
 
         if( self.controller.messageToMain(3, (staffName, datetime.time(hr, min))) == NOSUCCESS): # Pass back datetime object?
