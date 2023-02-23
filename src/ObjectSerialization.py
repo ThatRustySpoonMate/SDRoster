@@ -2,7 +2,7 @@ import pickle, os # Used for serializing staff to files as well as converting se
 from Normies import ITSDStaff
 
 
-objectFolder = "{}//data//".format(os.getcwd())
+objectsFP = "{}//data//".format(os.getcwd())
 FILE_EXT = ".sus"
 
 # Make sure param1 is full name from the staff object

@@ -67,6 +67,7 @@ def get_shift_data(shift_types, date, api_token = ""):
 			api_error_data = api_response.json()
 			print(api_error_data['data']) # prints general error message
 			print(api_error_data['error']) # print specific hint error
+			return False
 			
 	else:
 		# temp output

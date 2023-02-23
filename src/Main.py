@@ -2,7 +2,7 @@
 from Normies import ITSDStaff # Defines WSU Staff class
 from FormattingFunctions import *
 import ConfigInterface # Reading data from text files
-import GUIHandler, LunchGenerator, ChatRosterGenerator, PendingsRosterGenerator, APIKeyRetriever
+import GUIHandler, LunchGenerator, ChatRosterGenerator, PendingsRosterGenerator, APIKeyHandler, ObjectSerialization
 import ShiftRetreiver
 
 # Python bundled deps
@@ -36,26 +36,26 @@ import requests
         apiKey <string>
 """
 def messageFromGUI(reqType, reqParam = 0):
-    global ShiftData, ShiftDataTrimmed
+    global ShiftData, ShiftDataTrimmed, NumStaff
 
     reply = ""
     print("Main received Request {} from GUI ".format( (reqType, reqParam) )) # Debug option
 
     if(reqType == 1): # API Key request
         if(reqParam == 0):
-            reply = APIKeyRetriever.retrieveFromFile()
+            reply = APIKeyHandler.retrieveFromFile()
         else:
-            reply = APIKeyRetriever.retrieveFromWeb()
+            reply = APIKeyHandler.retrieveFromWeb()
         
     elif(reqType == 2): # Request for lunch roster output
-        reply = LunchGenerator.GetLunchSlots(LunchWeightsDict, LunchStart, LunchEnd)
+        reply = LunchGenerator.GetLunchSlots(LunchWeightsDict, LunchStart, LunchEnd, NumStaff)
         
     elif(reqType == 3): # Change assigned lunch
         try:
             # Update the staff member's lunch time in their staff member object
             staffName = reqParam[0]
             lunchTime = reqParam[1]
-            StaffToday[staffName].set_lunchtime = lunchTime # Update
+            StaffWorking[staffName].set_lunchtime = lunchTime # Update
             # If successful
             reply = GUIHandler.SUCCESS
         except Exception as exc:
@@ -66,16 +66,35 @@ def messageFromGUI(reqType, reqParam = 0):
         print(ShiftTypes) # REMOVE
         # Get staff working today
         ShiftData = ShiftRetreiver.get_shift_data(ShiftTypes, RosterDate, reqParam) # GetShiftData function needs to also return true or false if API key is valid
-        print("CHECK THIS: {}".format(ShiftData)) # REMOVE
 
-        ShiftDataTrimmed = ShiftRetreiver.trim_data(ShiftData, RosterDate, ShiftTypes)
-        print("CHECK THIS trimmed: {}".format(ShiftDataTrimmed)) # REMOVE
+        if(ShiftData != None):
+            NumStaff = len(ShiftData)
+            print("Number of staff working today: {}".format(NumStaff)) # REMOVE
+            
+            input("CHECK THIS: {}".format(ShiftData)) # REMOVE
 
-        # Load in staff objects
+            # Trim received data
+            ShiftDataTrimmed = ShiftRetreiver.trim_data(ShiftData, RosterDate, ShiftTypes) 
+            print("CHECK THIS trimmed: {}".format(ShiftDataTrimmed)) # REMOVE
+
+            # Load staff objects into memory 
+            for staffDetail in ShiftDataTrimmed:
+                StaffWorking[staffDetail[0]] = ObjectSerialization.loadSingleStaff(staffDetail)
+
+            print("Staff working today: {}".format(StaffWorking)) # REMOVE
+            
 
 
-        # If successful, save it to tokenFile and load in staff objects using the token
-        return (GUIHandler.NOSUCCESS, "Error message here")
+            # Store API Key to credentials File
+            APIKeyHandler.storeCredentials(reqParam)
+
+            return (GUIHandler.SUCCESS, "API Key Success")
+
+        else:
+            return(GUIHandler.NOSUCCESS, "Invalid API Key or API key has expired.")
+    
+
+        
     
     elif(reqType == 5): # Requesting Chat roster output
         reply = ChatRosterGenerator.generateChatRoster()
@@ -88,7 +107,7 @@ def messageFromGUI(reqType, reqParam = 0):
             # Update the staff member's chat status in their staff member object
             staffName = reqParam[0]
             chatFlag = reqParam[1]
-            StaffToday[staffName].on_chat = chatFlag
+            StaffWorking[staffName].on_chat = chatFlag
             # If successful
             reply = GUIHandler.SUCCESS
         except Exception as exc:
@@ -114,11 +133,15 @@ if __name__ == "__main__":
     LunchSlotTimes = ConfigInterface.readValue("lunchSlotTimes").split(",")
     ShiftTypes = ConfigInterface.readValue("shiftTypes").split(",")
 
-    RosterDate = datetime.today() # Date that the roster will be generated for
-    LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
+    NumStaff = 0 # Number of staff working on selected date
     ShiftData = [] # Return from get_shift_data function
     ShiftDataTrimmed = [] # Return from trim_data function
-    StaffToday = {} # Array of all the objects corresponding to staff that are working today, key is staffname, value is object
+    StaffWorking = {} # Array of all the objects corresponding to staff that are working today, key is staffname, value is object
+    RosterDate = datetime.today() # Date that the roster will be generated for
+    
+    LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
+
+    
 
     
 
