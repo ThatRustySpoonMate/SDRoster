@@ -62,13 +62,13 @@ def get_shift_data(shift_types, date, api_token = ""):
 			if not formatted_shift_data:
 				print("No shifts after formatting raw shift data")
 			else:
-				return formatted_shift_data
+				return formatted_shift_data, len(formatted_shift_data)
 		else: # returns with errors
 			#@TODO proper GUI feedback
 			api_error_data = api_response.json()
 			print(api_error_data['data']) # prints general error message
 			print(api_error_data['error']) # print specific hint error
-			return False
+			return False, None
 			
 	else:
 		# temp output
@@ -76,7 +76,7 @@ def get_shift_data(shift_types, date, api_token = ""):
 		api_error_data = api_response.json()
 		print(api_error_data['data']) # prints general error message
 		print(api_error_data['error']) # print specific hint error
-		return False
+		return False, None
 		
 # This function takes in a response and removes data note required for the roster generator
 #	shift_list - Raw response data from API call, should be in the form of an object array

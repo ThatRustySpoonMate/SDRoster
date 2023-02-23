@@ -12,8 +12,9 @@ def GetLunchSlots(time_weights_dict, lunches_start, lunches_end, num_staff):
 	
 	# split dictionary into lists of keys and values
 	# need to be in lists so they can be iterated through when interpolating weights
-	key_times = list(time_weights_dict.key)
-	key_weights = list(time_weights_dict.value)
+	key_times = list(time_weights_dict.keys())
+	key_weights = list(time_weights_dict.values())
+
 
 	# If no key times are available, it will default to an even distribution, slightly favouring the morning
 	# due to the way shifts are handed out, thre may be an additional shift appended at the end
@@ -37,6 +38,7 @@ def GetLunchSlots(time_weights_dict, lunches_start, lunches_end, num_staff):
 	time_step = timedelta(minutes=30)
 
 	# Calculate the number of time slots
+
 	num_slots = int((key_times[-1] - key_times[0]) / time_step) + 1
 	left_time = key_times[0]
 	right_time = key_times[-1]
@@ -84,7 +86,7 @@ def GetLunchSlots(time_weights_dict, lunches_start, lunches_end, num_staff):
 
 	for slot in range(num_slots):
 		current_time = key_times[0] + slot * time_step
-		avilable_slots[current_time] = values[slot]
+		avilable_slots[current_time.time()] = values[slot]
 
 	return avilable_slots
 

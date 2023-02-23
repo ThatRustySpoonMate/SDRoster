@@ -53,7 +53,7 @@ CNFG_FOLDER = "{}\\config\\".format(os.getcwd())
 
 
 # Placement of dynamic content on lunch/chat/pendings pages
-staffDisplayCol0 = 125 # Starting X position of col0 staff lunch
+staffDisplayCol0 = 150 # Starting X position of col0 staff lunch
 staffDisplayCol1 = WINDOW_WIDTH / 2 + staffDisplayCol0 # Starting X position of col1 staff lunch
 staffDisplayStartY = 100 # Starting Y position of col0 row0 staff lunch
 staffDisplayIncrementY = 50 # Gap between each row of staff lunches 

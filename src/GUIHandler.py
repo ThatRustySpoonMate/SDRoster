@@ -405,6 +405,8 @@ class LunchRosterMenu(tk.Frame):
 
         # Request a lunch roster to display, this can then be edited by the user
         self.lunchTimes = self.controller.messageToMain(2).copy()
+        for k, v in self.lunchTimes.items():
+            self.lunchTimes[k] = v.strftime('%I:%M%p')
         
         # Create a label and drop down for each staff member (label) and their lunch times (Drop down)
         for staffName in self.lunchTimes:
@@ -460,7 +462,7 @@ class LunchRosterMenu(tk.Frame):
         increment = 0
         for staffName in self.lunchTimeWidgets:
 
-            self.lunchTimeWidgets[staffName][0].place(x = (staffDisplayCol0 - (10*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 - (10*len(staffName))), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
+            self.lunchTimeWidgets[staffName][0].place(x = (staffDisplayCol0 - 34 - (6*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 - 34 - (6*len(staffName))), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
             self.lunchTimeWidgets[staffName][1].place(x = (staffDisplayCol0 + staffDisplayDrpDwnOffset) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 + staffDisplayDrpDwnOffset), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY)) 
  
 
@@ -477,7 +479,14 @@ class LunchRosterMenu(tk.Frame):
 
     def updateLunch(self, staffName, newTime):
         print("Updating lunch for {} to {}".format(staffName, newTime))
-        if( self.controller.messageToMain(3, (staffName, newTime)) == NOSUCCESS):
+
+        hr = int(newTime.split(":")[0][:2])
+        min = int(newTime.split(":")[1][:2])
+
+        if("pm" in newTime.lower()):
+            hr += 12
+
+        if( self.controller.messageToMain(3, (staffName, datetime.time(hr, min))) == NOSUCCESS): # Pass back datetime object?
             # Unable to update lunch time
             messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
 
