@@ -81,6 +81,8 @@ class RosterWindow(tk.Tk):
             # Requesting to go back to previous page
             frame = self.prevFrame
         else:
+            if(self.activeFrame == self.frames[ChatMenu]):
+                self.frames[ChatMenu].updateAssigneds() # If we are navigating from chat to another page, force the chat page to push it's checkboxes across to main
             # Go to requested page
             frame = self.frames[page]
 
@@ -682,8 +684,6 @@ class PendingsMenu(tk.Frame):
 
     # Renders all UI Elements
     def draw(self):
-
-        self.controller.frames[ChatMenu].updateAssigneds() # If we have reached this page, force the chat page to push it's checkboxes across to main
 
         self.config(bg=BGND_COL)
 
