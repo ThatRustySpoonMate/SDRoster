@@ -462,7 +462,7 @@ class LunchRosterMenu(tk.Frame):
         increment = 0
         for staffName in self.lunchTimeWidgets:
 
-            self.lunchTimeWidgets[staffName][0].place(x = (staffDisplayCol0 - 34 - (6*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 - 34 - (6*len(staffName))), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
+            self.lunchTimeWidgets[staffName][0].place(x = (staffDisplayCol0 - staffDropDownLabelOffset - (staffPixelsPerCharacterOffset*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 - staffDropDownLabelOffset - (staffPixelsPerCharacterOffset*len(staffName))), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
             self.lunchTimeWidgets[staffName][1].place(x = (staffDisplayCol0 + staffDisplayDrpDwnOffset) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 + staffDisplayDrpDwnOffset), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY)) 
  
 

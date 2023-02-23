@@ -58,4 +58,6 @@ staffDisplayCol1 = WINDOW_WIDTH / 2 + staffDisplayCol0 # Starting X position of 
 staffDisplayStartY = 100 # Starting Y position of col0 row0 staff lunch
 staffDisplayIncrementY = 50 # Gap between each row of staff lunches 
 staffDisplayDrpDwnOffset = 0 # Gap between start of staff name and start of drop-down selector
+staffDropDownLabelOffset = 40 # Offset between lunch drop-down menu and their name
+staffPixelsPerCharacterOffset = 6 # Move the lunch drop-down menu name this many pixels * length of their name 
 
