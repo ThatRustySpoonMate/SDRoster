@@ -63,34 +63,26 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = GUIHandler.NOSUCCESS
     
     elif(reqType == 4): # Requesting to check provided API Key
-        print(ShiftTypes) # REMOVE
         # Get staff working today
-        ShiftData = ShiftRetreiver.get_shift_data(ShiftTypes, RosterDate, reqParam) # GetShiftData function needs to also return true or false if API key is valid
+        ShiftData = ShiftRetreiver.get_shift_data(ShiftTypes, RosterDate, reqParam)
 
-        if(ShiftData != None):
+        if(ShiftData != None): # Data is valid
             NumStaff = len(ShiftData)
-            print("Number of staff working today: {}".format(NumStaff)) # REMOVE
-            
-            input("CHECK THIS: {}".format(ShiftData)) # REMOVE
-
-            # Trim received data
-            ShiftDataTrimmed = ShiftRetreiver.trim_data(ShiftData, RosterDate, ShiftTypes) 
-            print("CHECK THIS trimmed: {}".format(ShiftDataTrimmed)) # REMOVE
 
             # Load staff objects into memory 
-            for staffDetail in ShiftDataTrimmed:
+            for staffDetail in ShiftData:
+                input(staffDetail)
                 StaffWorking[staffDetail[0]] = ObjectSerialization.loadSingleStaff(staffDetail)
-
-            print("Staff working today: {}".format(StaffWorking)) # REMOVE
             
-
+            print(StaffWorking)
 
             # Store API Key to credentials File
             APIKeyHandler.storeCredentials(reqParam)
 
             return (GUIHandler.SUCCESS, "API Key Success")
 
-        else:
+        else: # API Key Error
+            print("API Error")
             return(GUIHandler.NOSUCCESS, "Invalid API Key or API key has expired.")
     
 
@@ -135,15 +127,11 @@ if __name__ == "__main__":
 
     NumStaff = 0 # Number of staff working on selected date
     ShiftData = [] # Return from get_shift_data function
-    ShiftDataTrimmed = [] # Return from trim_data function
     StaffWorking = {} # Array of all the objects corresponding to staff that are working today, key is staffname, value is object
     RosterDate = datetime.today() # Date that the roster will be generated for
     
     LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
 
-    
-
-    
 
     
     # Create the GUI Application window and hand it the communication function so tht it can communicate with Main

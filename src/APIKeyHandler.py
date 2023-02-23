@@ -1,6 +1,6 @@
 import os, webbrowser
 
-credentialsFP = "{}//credentials//credentials.txt".format(os.getcwd())
+credentialsFP = "{}//credentials//tokenFile.txt".format(os.getcwd())
 
 # Function that reads the contents of the tokenFile stored in /credentials/ and returns the contents as a string 
 def retrieveFromFile():

@@ -6,9 +6,10 @@ objectsFP = "{}//data//".format(os.getcwd())
 FILE_EXT = ".sus"
 
 # Make sure param1 is full name from the staff object
+# Private func
 def __loadStaffObject(staffName): 
     # Load the object of the requested staff member, if it does not exist, create it
-    allStaffFiles = os.listdir(objectFolder)
+    allStaffFiles = os.listdir(objectsFP)
 
     # Search for the .sus file
     found = False
@@ -19,15 +20,21 @@ def __loadStaffObject(staffName):
 
     if(found):
         # File is present, load it then return loaded object
-        inputFilePath = objectFolder + staffName + FILE_EXT
-        inputFile = open(inputFilePath, 'rb')
-        staffObject = pickle.load(inputFile)
-        inputFile.close()
+        try:
+            # de-serialize file contents into an ITSDStaff Object
+            inputFilePath = objectsFP + staffName + FILE_EXT
+            inputFile = open(inputFilePath, 'rb')
+            staffObject = pickle.load(inputFile)
+            inputFile.close()
+            return staffObject
 
-        return staffObject
+        except Exception as exc:
+            # If failed -- likely due to no or corrupt file contents -- return None so a base object is created and saved
+            return None
+
     else:
         # Unable to locate staff file
-        newFile = open(objectFolder + staffName + FILE_EXT, mode = "x", encoding = "UTF-8")
+        newFile = open(objectsFP + staffName + FILE_EXT, mode = "x", encoding = "UTF-8")
         newFile.close()
         return None
 
@@ -36,7 +43,7 @@ def __saveStaffObject(staffObj):
     # If file does not exist for staff member, create it
 
     # Load the object of the requested staff member, if it does not exist, create it
-    allStaffFiles = os.listdir(objectFolder)
+    allStaffFiles = os.listdir(objectsFP)
 
     # Search for the .sus file
     found = False
@@ -46,7 +53,7 @@ def __saveStaffObject(staffObj):
 
     if(found):
         # Save object to corresponding file
-        outputFilePath = objectFolder + staffObj.full_name + FILE_EXT
+        outputFilePath = objectsFP + staffObj.full_name + FILE_EXT
         outputFile = open(outputFilePath, 'wb')
         pickle.dump(staffObj, outputFile)
         outputFile.close()
@@ -72,8 +79,6 @@ def loadSingleStaff(staffDetails):
         newStaff = ITSDStaff(staffDetails[0], 1, 0, 0, 0, None, None) # Maybe change default behaviour for new staff?
         __saveStaffObject(newStaff)
         return newStaff 
-
-
 
     return
 

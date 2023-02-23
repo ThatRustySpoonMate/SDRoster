@@ -34,8 +34,9 @@ def get_shift_data(shift_types, date, api_token = ""):
 
 	# @TODO load token file correctly, below lines are temporary
 	if(api_token == ""):
-		api_token_file = open('tokenFile.txt') # place holder file opening
-		api_token = api_token_file.read() 
+		return None
+		#api_token_file = open('tokenFile.txt') # place holder file opening
+		#api_token = api_token_file.read() 
 
 	request_url = "https://www.humanity.com/api/v2/shifts?start_date=" + selected_date + "&end_date=" + selected_date + "&access_token=" +  api_token
 
