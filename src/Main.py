@@ -116,16 +116,6 @@ def messageFromGUI(reqType, reqParam = 0):
 
 if __name__ == "__main__":
 
-    """
-    time_weights = {datetime(2023, 2, 23, 11, 00):2, datetime(2023, 2, 23, 12, 00):1, datetime(2023, 2, 23, 13, 00):3, datetime(2023, 2, 23, 14, 00):1, datetime(2023, 2, 23, 15, 00):2}
-    lunches_start = datetime(2023, 2, 23, 11, 00)
-    lunches_end = datetime(2023, 2, 23, 15, 00)
-    num_staff = 10
-
-    input(LunchGenerator.GetLunchSlots(time_weights, lunches_start, lunches_end, num_staff))
-
-    """
-
     RosterDate = datetime.today() # Date that the roster will be generated for
     # Load in config data
     LunchStart = ConfigInterface.readValue("lunchStart")
@@ -138,10 +128,8 @@ if __name__ == "__main__":
     ShiftData = [] # Return from get_shift_data function
     StaffWorking = {} # Array of all the objects corresponding to staff that are working today, key is staffname, value is object
     
-    
     LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
-
-
+    
     
     # Create the GUI Application window and hand it the communication function so tht it can communicate with Main
     MainWindow = GUIHandler.RosterWindow(messageFromGUI)
