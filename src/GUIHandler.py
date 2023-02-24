@@ -842,7 +842,7 @@ class ConfigurationMenu(tk.Frame):
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 80, y = HEADING_Y)
         self.pageDescriptor.place(x = WINDOW_WIDTH / 2 - 190, y = HEADING_Y + 30)
-        self.closeButton.place(x = 20, y = 20)
+        self.closeButton.place(x = 10, y = 10)
 
 
 class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
@@ -941,22 +941,27 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
         self.selectedStaffLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.prefLunchLabel.config(bg = BGND_COL, fg=TEXT_COL)
+        self.prefLunchDropDown["highlightthickness"] = 0
         self.prefLunchDropDown.config(bg = BGND_COL, fg=BTN_COL)
 
         self.chatWeightingLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.chatCompetencyLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.chatCapableLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.chatCompetencyDropDown.config(bg=BGND_COL, fg=BTN_COL)
+        self.chatCompetencyDropDown["highlightthickness"] = 0
+
 
         if(self.selectedStaff != None):
             self.chatCapableVar.set(self.selectedStaff.on_chat)
             self.chatCompetencyVar.set( CHAT_COMPETENCIES[self.selectedStaff.chat_competency] )
+            self.chatWeightingInput.delete(1.0, tk.END)
+            self.chatWeightingInput.insert(tk.END, self.selectedStaff.chat_weight)
         
         
 
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
-        self.closeButton.place(x = 20, y = 20)
+        self.closeButton.place(x = 10, y = 10)
         self.staffListDisplay.place(x = 55, y = 75)
         self.staffLoadButton.place(x = 110, y = WINDOW_HEIGHT - 85)
 
@@ -992,7 +997,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
     def saveChanges(self):
         # Read variables from widgets into object memory
-        
+
         # Tell main to store changes to the object 
         self.controller.messageToMain( 11, self.selectedStaff )
 
