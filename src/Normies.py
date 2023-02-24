@@ -12,15 +12,32 @@
 # set_lunchtime 	- this is the set lunch time for an employee, this can be due to an agreed upon situation, or an agreed upon standard lunch time
 
 class ITSDStaff():
-	def __init__(self, full_name, chat_weight, chat_competency, pending_competency, on_chat, preferred_lunchtime, actual_lunchtime):
-		self.full_name = full_name
-		self.chat_weight = chat_weight
-		self.chat_competency = chat_competency
-		self.pending_competency = pending_competency
-		self.on_chat = on_chat
-		self.chat_priority = False
-		self.preferred_lunchtime = preferred_lunchtime
-		self.actual_lunchtime = actual_lunchtime
+	def __init__(self, full_name, chat_weight, chat_competency, pending_competency, on_chat, preferred_lunchtime, actual_lunchtime, origin = None):
+		
+		if(origin != None): # Copy Constructor
+			self.__copy_constructor(origin)
+		else:
+			self.full_name = full_name
+			self.chat_weight = chat_weight
+			self.chat_competency = chat_competency
+			self.pending_competency = pending_competency
+			self.on_chat = on_chat
+			self.chat_priority = False
+			self.preferred_lunchtime = preferred_lunchtime
+			self.actual_lunchtime = actual_lunchtime
+
+		
+	# Copy constructor 
+	def __copy_constructor(self, origin):
+		self.full_name = origin.full_name
+		self.chat_weight = origin.chat_weight
+		self.chat_competency = origin.chat_competency
+		self.pending_competency = origin.pending_competency
+		self.on_chat = origin.on_chat
+		self.chat_priority = origin.chat_priority
+		self.preferred_lunchtime = origin.preferred_lunchtime
+		self.actual_lunchtime = origin.actual_lunchtime
+
 	
 	# increments chat weight proportional to the employee's chat competency so that more experienced people are more likely to be on chat
 	# this should be called whenever the employee is not assigned to chat
@@ -38,3 +55,5 @@ class ITSDStaff():
 	# this should be called whenever a user is assigned to chat
 	def reset_chat_weight(self):
 		self.chat_weight = 1
+
+

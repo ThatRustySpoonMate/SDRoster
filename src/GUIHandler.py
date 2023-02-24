@@ -854,6 +854,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.controller = controller # Reference to parent object
         self.firstLoad = True # Flag for first time loading of page
         self.staffList = []
+        self.selectedStaff = None
 
         # Set background colour
         self.config(bg=BGND_COL)
@@ -864,6 +865,15 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         # Selectable list of staff members
         self.staffListDisplay = CreateElement(controller, tk.Listbox, master=self, width = 20, height = 24, font = STD_FONT)
         self.staffLoadButton = CreateElement(controller, tk.Button, master=self, text = "LOAD", font=API_BTN_FONT, command=self.loadSelected)
+        self.staffSaveButton = CreateElement(controller, tk.Button, master=self, text = "SAVE", font=API_BTN_FONT, command=self.saveChanges)
+
+        # Staff Object Parameters
+        self.selectedStaffLabel = CreateElement(self.controller, tk.Label, master=self, font = HEADING_FONT)
+
+        self.prefLunchLabel= CreateElement(self.controller, tk.Label, master=self, text = "Preferred Lunch", font=DROP_DOWN_LABEL_FONT) 
+        self.prefLunchVar = tk.StringVar() # Create rkinter variable for the selected drop-down value
+        self.prefLunchVar.set(None)
+        self.prefLunchDropDown = tk.OptionMenu(self, self.prefLunchVar, *LUNCH_TIMESLOTS)
         
 
         # Prev page button
@@ -886,6 +896,10 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.closeButton.place_forget()
         self.staffListDisplay.place_forget()
         self.staffLoadButton.place_forget()
+        self.selectedStaffLabel.place_forget()
+        self.prefLunchLabel.place_forget()
+        self.prefLunchDropDown.place_forget()
+        self.staffSaveButton.place_forget()
 
 
     # Renders all UI Elements
@@ -896,34 +910,56 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
-
-
-        self.staffListDisplay.delete(0, tk.END)
+        self.staffSaveButton.config(bg = BGND_COL, fg=BTN_COL)
         self.staffList = self.controller.messageToMain(9)
         self.staffListDisplay.config(bg=BGND_COL, fg=TEXT_COL)
         self.staffLoadButton.config(bg=BGND_COL, fg=BTN_COL)
 
+        self.staffListDisplay.delete(0, tk.END)
+
         for staffName in self.staffList:
             self.staffListDisplay.insert(tk.END, staffName)
+
+        self.selectedStaffLabel.config(bg = BGND_COL, fg=TEXT_COL)
+        self.prefLunchLabel.config(bg = BGND_COL, fg=TEXT_COL)
+        self.prefLunchDropDown.config(bg = BGND_COL, fg=BTN_COL)
+        
 
 
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
         self.closeButton.place(x = 20, y = 20)
         self.staffListDisplay.place(x = 55, y = 75)
-        self.staffLoadButton.place(x = 110, y = 520)
+        self.staffLoadButton.place(x = 110, y = WINDOW_HEIGHT - 85)
+
+        if(self.selectedStaff != None):
+            # We have loaded a staff member to edit
+                self.selectedStaffLabel.place(x = WINDOW_WIDTH / 2 + 150 - (6* len(self.selectedStaff.full_name) ), y = HEADING_Y + 50)
+                self.prefLunchLabel.place(x = WINDOW_WIDTH / 2 + 20, y = HEADING_Y + 80)
+                self.prefLunchDropDown.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 80)
+                self.staffSaveButton.place(x = WINDOW_WIDTH / 2 + 120, y = WINDOW_HEIGHT - 85)
 
     # Function that runs continuously on a separate thread to poll which staff member is selected to manage and loads their information to view/edit
     def loadSelected(self):
         # This runs every 0.5 seconds on a separate thread currently 
-        selectedIndex = self.staffListDisplay.curselection()
+        selectedIndex = self.staffListDisplay.curselection()[0]
         selectedStaffName = self.staffList[selectedIndex]
-        print("Selected: {}".format(selectedStaffName))
+        self.selectedStaff = self.controller.messageToMain(10, [selectedStaffName] )
 
+        self.selectedStaffLabel.config(bg=BGND_COL, fg=TEXT_COL, text=selectedStaffName)
+        self.prefLunchVar.set(self.selectedStaff.preferred_lunchtime) # Set this variable to this staff members allocated lunch time
+        self.prefLunchDropDown = tk.OptionMenu(self, self.prefLunchVar, *LUNCH_TIMESLOTS)
 
 
         self.clear()
         self.draw()
+
+
+    def saveChanges(self):
+        # Read variables from widgets into object memory
+
+        # Tell main to store changes to the object 
+        self.controller.messageToMain( (11, self.selectedStaff) )
 
 
 

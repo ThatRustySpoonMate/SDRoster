@@ -109,12 +109,15 @@ def messageFromGUI(reqType, reqParam = 0):
     elif(reqType == 9): # Requesting list of staff names in data file
         reply = ObjectSerialization.getAllStaffNames()
 
-    elif(reqType == 10): # Requesting editable staff information
+    elif(reqType == 10): # Requesting editable staff information (object)
+        reply = ObjectSerialization.loadSingleStaff(reqParam)
+        """
         if(reqParam in list(StaffWorking.keys())):
             # Staff is loaded into memory
             reply = StaffWorking[reqParam]
         else:
             reply = ObjectSerialization.loadSingleStaff(reqParam)
+        """
     
     elif(reqType == 11): # Updating editable staff information
         # If object is loaded into memory, edit it in memory and save it to the file
