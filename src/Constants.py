@@ -90,3 +90,9 @@ LUNCH_TIMESLOTS = [ # All possible lunch times that will show up in the drop dow
     datetime.time(15, 00).strftime('%I:%M%p'),
     datetime.time(15, 30).strftime('%I:%M%p')
 ]
+
+CHAT_COMPETENCIES = [
+    "0 - Not Applicable",
+    "1 - Backup Only",
+    "2 - Fully Trained"
+]

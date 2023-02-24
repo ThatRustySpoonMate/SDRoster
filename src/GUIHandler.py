@@ -874,6 +874,18 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.prefLunchVar = tk.StringVar() # Create rkinter variable for the selected drop-down value
         self.prefLunchVar.set(None)
         self.prefLunchDropDown = tk.OptionMenu(self, self.prefLunchVar, *LUNCH_TIMESLOTS)
+
+        self.chatWeightingLabel = CreateElement(self.controller, tk.Label, master=self, text = "Chat weighting", font=DROP_DOWN_LABEL_FONT) 
+        self.chatWeightingInput = tk.Text(self, width = 3, height = 1, font=STD_FONT)
+
+        self.chatCompetencyLabel = CreateElement(self.controller, tk.Label, master=self, text = "Chat competency", font=DROP_DOWN_LABEL_FONT) 
+        self.chatCompetencyVar = tk.StringVar()
+        self.chatCompetencyVar.set(None)
+        self.chatCompetencyDropDown = tk.OptionMenu(self, self.chatCompetencyVar, *CHAT_COMPETENCIES)
+
+        self.chatCapableLabel = CreateElement(self.controller, tk.Label, master=self, text = "Chat capable", font=DROP_DOWN_LABEL_FONT) 
+        self.chatCapableVar = tk.IntVar() # Variable to store status of checkbox (0/1)
+        self.chatCapableButton = tk.Checkbutton(self, variable = self.chatCapableVar)
         
 
         # Prev page button
@@ -900,6 +912,13 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.prefLunchLabel.place_forget()
         self.prefLunchDropDown.place_forget()
         self.staffSaveButton.place_forget()
+        self.chatWeightingInput.place_forget()
+        self.chatWeightingLabel.place_forget()
+        self.chatCompetencyLabel.place_forget()
+        self.chatCompetencyDropDown.place_forget()
+        self.chatCapableLabel.place_forget()
+        self.chatCapableButton.place_forget()
+        
 
 
     # Renders all UI Elements
@@ -923,8 +942,17 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.selectedStaffLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.prefLunchLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.prefLunchDropDown.config(bg = BGND_COL, fg=BTN_COL)
-        
 
+        self.chatWeightingLabel.config(bg=BGND_COL, fg=TEXT_COL)
+        self.chatCompetencyLabel.config(bg=BGND_COL, fg=TEXT_COL)
+        self.chatCapableLabel.config(bg=BGND_COL, fg=TEXT_COL)
+        self.chatCompetencyDropDown.config(bg=BGND_COL, fg=BTN_COL)
+
+        if(self.selectedStaff != None):
+            self.chatCapableVar.set(self.selectedStaff.on_chat)
+            self.chatCompetencyVar.set( CHAT_COMPETENCIES[self.selectedStaff.chat_competency] )
+        
+        
 
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
@@ -935,9 +963,16 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         if(self.selectedStaff != None):
             # We have loaded a staff member to edit
                 self.selectedStaffLabel.place(x = WINDOW_WIDTH / 2 + 150 - (6* len(self.selectedStaff.full_name) ), y = HEADING_Y + 50)
-                self.prefLunchLabel.place(x = WINDOW_WIDTH / 2 + 20, y = HEADING_Y + 80)
+                self.prefLunchLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 80)
                 self.prefLunchDropDown.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 80)
                 self.staffSaveButton.place(x = WINDOW_WIDTH / 2 + 120, y = WINDOW_HEIGHT - 85)
+
+                self.chatWeightingLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 120)
+                self.chatWeightingInput.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 124)
+                self.chatCompetencyLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 160)
+                self.chatCompetencyDropDown.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 160)
+                self.chatCapableLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 200)
+                self.chatCapableButton.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 200)
 
     # Function that runs continuously on a separate thread to poll which staff member is selected to manage and loads their information to view/edit
     def loadSelected(self):
@@ -957,7 +992,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
     def saveChanges(self):
         # Read variables from widgets into object memory
-
+        
         # Tell main to store changes to the object 
         self.controller.messageToMain( 11, self.selectedStaff )
 
