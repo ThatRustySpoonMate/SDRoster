@@ -73,8 +73,6 @@ def messageFromGUI(reqType, reqParam = 0):
             # Load staff objects into memory 
             for staffDetail in ShiftData:
                 StaffWorking[staffDetail[0]] = ObjectSerialization.loadSingleStaff(staffDetail)
-            
-            print(StaffWorking)
 
             # Store API Key to credentials File
             APIKeyHandler.storeCredentials(reqParam)
