@@ -24,6 +24,7 @@ TURQUOISE = "#30D5C8"
 LIGHT_GREY = "#bebebe"
 MEDIUM_GREY = "#7D7F7C"
 DARK_SLATE_BLUE = "#06394f"
+CHEESE_YELLOW = "#ffa600"
 
 # WSU Colours definition
 WSU_CRIMSON = "#990033"
@@ -53,9 +54,11 @@ CNFG_FOLDER = "{}\\config\\".format(os.getcwd())
 
 
 # Placement of dynamic content on lunch/chat/pendings pages
-staffDisplayCol0 = 125 # Starting X position of col0 staff lunch
+staffDisplayCol0 = 150 # Starting X position of col0 staff lunch
 staffDisplayCol1 = WINDOW_WIDTH / 2 + staffDisplayCol0 # Starting X position of col1 staff lunch
 staffDisplayStartY = 100 # Starting Y position of col0 row0 staff lunch
 staffDisplayIncrementY = 50 # Gap between each row of staff lunches 
 staffDisplayDrpDwnOffset = 0 # Gap between start of staff name and start of drop-down selector
+staffDropDownLabelOffset = 40 # Offset between lunch drop-down menu and their name
+staffPixelsPerCharacterOffset = 6 # Move the lunch drop-down menu name this many pixels * length of their name 
 

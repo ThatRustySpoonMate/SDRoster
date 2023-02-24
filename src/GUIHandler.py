@@ -4,6 +4,7 @@ from Normies import ITSDStaff
 import random, datetime
 from Constants import *
 from functools import partial # This is pure magic
+import sys
 
 # TODO: Expand GUI
 
@@ -37,8 +38,19 @@ class RosterWindow(tk.Tk):
         self.activeFrame = None # Stores which frame is currently displayed to the user
         self.prevFrame = None # Stores the frame that navigated to the current frame
 
-        if("isabel" in os.getlogin().lower()): # Change to Isabel's staff number
-            self.EEM = 1  # Isabel Detected
+        if("30060060" in os.getlogin().lower()): 
+            # Isabel Detected
+            self.EEM = 1  
+        elif("90954999" in os.getlogin().lower()): 
+             # Sean Maclean detected
+            if(random.randrange(0, 3) != 2):
+                #66% of time
+                messagebox.showwarning("!!CONTRACTOR DETECTED!!", "Contractor detected!\nProgram will self-destruct in t-10 seconds to protect the cheese.")
+                self.after(10000, self.destroy)
+            else:
+                # 33% of time
+                self.after(250, self.drawCheese)
+
         elif(random.randrange(0, 30) == 23):
             self.EEM = 2  # UWU Mode
 
@@ -81,6 +93,8 @@ class RosterWindow(tk.Tk):
             # Requesting to go back to previous page
             frame = self.prevFrame
         else:
+            if(self.activeFrame == self.frames[ChatMenu]):
+                self.frames[ChatMenu].updateAssigneds() # If we are navigating from chat to another page, force the chat page to push it's checkboxes across to main
             # Go to requested page
             frame = self.frames[page]
 
@@ -103,6 +117,12 @@ class RosterWindow(tk.Tk):
         self.activeFrame.clear()
         self.activeFrame.draw()
         print("Hamburger Menu status: {}".format(self.showNavBar))
+
+
+    def drawCheese(self):
+        tempCheese = tk.Label(self.activeFrame, text = "cheese", font = ('Helvetica bold', 9), bg=CHEESE_YELLOW)
+        tempCheese.place( x = random.randrange(0, WINDOW_WIDTH) , y = random.randrange(0, WINDOW_HEIGHT) )
+        self.after(400, self.drawCheese)
 
 
 
@@ -155,6 +175,7 @@ class MainMenu(tk.Frame):
         
     def onFirstLoad(self):
         # Draw all UI elements to screen
+
         self.draw()
 
         self.firstLoad = False
@@ -405,6 +426,8 @@ class LunchRosterMenu(tk.Frame):
 
         # Request a lunch roster to display, this can then be edited by the user
         self.lunchTimes = self.controller.messageToMain(2).copy()
+        for k, v in self.lunchTimes.items():
+            self.lunchTimes[k] = v.strftime('%I:%M%p')
         
         # Create a label and drop down for each staff member (label) and their lunch times (Drop down)
         for staffName in self.lunchTimes:
@@ -460,7 +483,7 @@ class LunchRosterMenu(tk.Frame):
         increment = 0
         for staffName in self.lunchTimeWidgets:
 
-            self.lunchTimeWidgets[staffName][0].place(x = (staffDisplayCol0 - (10*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 - (10*len(staffName))), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
+            self.lunchTimeWidgets[staffName][0].place(x = (staffDisplayCol0 - staffDropDownLabelOffset - (staffPixelsPerCharacterOffset*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 - staffDropDownLabelOffset - (staffPixelsPerCharacterOffset*len(staffName))), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
             self.lunchTimeWidgets[staffName][1].place(x = (staffDisplayCol0 + staffDisplayDrpDwnOffset) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 + staffDisplayDrpDwnOffset), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY)) 
  
 
@@ -477,7 +500,14 @@ class LunchRosterMenu(tk.Frame):
 
     def updateLunch(self, staffName, newTime):
         print("Updating lunch for {} to {}".format(staffName, newTime))
-        if( self.controller.messageToMain(3, (staffName, newTime)) == NOSUCCESS):
+
+        hr = int(newTime.split(":")[0][:2])
+        min = int(newTime.split(":")[1][:2])
+
+        if("pm" in newTime.lower() and hr != 12):
+            hr += 12
+
+        if( self.controller.messageToMain(3, (staffName, datetime.time(hr, min))) == NOSUCCESS): # Pass back datetime object?
             # Unable to update lunch time
             messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
 
@@ -673,8 +703,6 @@ class PendingsMenu(tk.Frame):
 
     # Renders all UI Elements
     def draw(self):
-
-        self.controller.frames[ChatMenu].updateAssigneds() # If we have reached this page, force the chat page to push it's checkboxes across to main
 
         self.config(bg=BGND_COL)
 

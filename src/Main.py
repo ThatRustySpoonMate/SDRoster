@@ -48,7 +48,10 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = APIKeyHandler.retrieveFromWeb()
         
     elif(reqType == 2): # Request for lunch roster output
-        reply = LunchGenerator.GetLunchSlots(LunchWeightsDict, LunchStart, LunchEnd, NumStaff)
+
+        lunchSlots = LunchGenerator.GetLunchSlots(LunchWeightsDict, LunchStart, LunchEnd, NumStaff)
+
+        reply = LunchGenerator.GetStaffLunches(lunchSlots, ShiftData)
         
     elif(reqType == 3): # Change assigned lunch
         try:
@@ -64,17 +67,12 @@ def messageFromGUI(reqType, reqParam = 0):
     
     elif(reqType == 4): # Requesting to check provided API Key
         # Get staff working today
-        ShiftData = ShiftRetreiver.get_shift_data(ShiftTypes, RosterDate, reqParam)
+        ShiftData, NumStaff = ShiftRetreiver.get_shift_data(ShiftTypes, RosterDate, reqParam)
 
-        if(ShiftData != None): # Data is valid
-            NumStaff = len(ShiftData)
-
+        if(ShiftData != False): # Data is valid
             # Load staff objects into memory 
             for staffDetail in ShiftData:
-                input(staffDetail)
                 StaffWorking[staffDetail[0]] = ObjectSerialization.loadSingleStaff(staffDetail)
-            
-            print(StaffWorking)
 
             # Store API Key to credentials File
             APIKeyHandler.storeCredentials(reqParam)
@@ -82,11 +80,9 @@ def messageFromGUI(reqType, reqParam = 0):
             return (GUIHandler.SUCCESS, "API Key Success")
 
         else: # API Key Error
-            print("API Error")
             return(GUIHandler.NOSUCCESS, "Invalid API Key or API key has expired.")
     
 
-        
     
     elif(reqType == 5): # Requesting Chat roster output
         reply = ChatRosterGenerator.generateChatRoster()
@@ -118,20 +114,20 @@ def messageFromGUI(reqType, reqParam = 0):
 
 if __name__ == "__main__":
 
+    RosterDate = datetime.today() # Date that the roster will be generated for
+    #RosterDate = datetime(2023, 2, 24, 10, 30, 1)
     # Load in config data
     LunchStart = ConfigInterface.readValue("lunchStart")
     LunchEnd = ConfigInterface.readValue("lunchEnd")
     LunchWeights = ConfigInterface.readValue("lunchWeights").split(",")
-    LunchSlotTimes = ConfigInterface.readValue("lunchSlotTimes").split(",")
+    LunchSlotTimes = convertToDateTime(ConfigInterface.readValue("lunchSlotTimes").split(","), RosterDate )
     ShiftTypes = ConfigInterface.readValue("shiftTypes").split(",")
 
     NumStaff = 0 # Number of staff working on selected date
     ShiftData = [] # Return from get_shift_data function
     StaffWorking = {} # Array of all the objects corresponding to staff that are working today, key is staffname, value is object
-    RosterDate = datetime.today() # Date that the roster will be generated for
     
     LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
-
 
     
     # Create the GUI Application window and hand it the communication function so tht it can communicate with Main
