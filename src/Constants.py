@@ -1,4 +1,4 @@
-import os
+import os, datetime
 
 # GUI Window parameters
 WINDOW_WIDTH = 600
@@ -62,3 +62,31 @@ staffDisplayDrpDwnOffset = 0 # Gap between start of staff name and start of drop
 staffDropDownLabelOffset = 40 # Offset between lunch drop-down menu and their name
 staffPixelsPerCharacterOffset = 6 # Move the lunch drop-down menu name this many pixels * length of their name 
 
+PENDINGS_TIMESLOTS = [ # All possible lunch times that will show up in the drop down menu
+    None,
+    datetime.time(8, 00).strftime('%I:%M%p'),
+    datetime.time(9, 00).strftime('%I:%M%p'),
+    datetime.time(10, 00).strftime('%I:%M%p'),
+    datetime.time(11, 00).strftime('%I:%M%p'),
+    datetime.time(12, 00).strftime('%I:%M%p'),
+    datetime.time(13, 00).strftime('%I:%M%p'),
+    datetime.time(14, 00).strftime('%I:%M%p'),
+    datetime.time(15, 00).strftime('%I:%M%p'),
+    datetime.time(16, 00).strftime('%I:%M%p'),
+    datetime.time(17, 00).strftime('%I:%M%p'),
+    datetime.time(18, 00).strftime('%I:%M%p')
+]
+
+LUNCH_TIMESLOTS = [ # All possible lunch times that will show up in the drop down menu
+    None,
+    datetime.time(11, 00).strftime('%I:%M%p'),
+    datetime.time(11, 30).strftime('%I:%M%p'),
+    datetime.time(12, 00).strftime('%I:%M%p'),
+    datetime.time(12, 30).strftime('%I:%M%p'),
+    datetime.time(13, 00).strftime('%I:%M%p'),
+    datetime.time(13, 30).strftime('%I:%M%p'),
+    datetime.time(14, 00).strftime('%I:%M%p'),
+    datetime.time(14, 30).strftime('%I:%M%p'),
+    datetime.time(15, 00).strftime('%I:%M%p'),
+    datetime.time(15, 30).strftime('%I:%M%p')
+]

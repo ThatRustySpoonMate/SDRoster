@@ -105,6 +105,22 @@ def messageFromGUI(reqType, reqParam = 0):
     elif(reqType == 8): # Change assigned pendings
         # Update the staff member's pending time in their staff member object
         reply = GUIHandler.SUCCESS
+    
+    elif(reqType == 9): # Requesting list of staff names in data file
+        reply = ObjectSerialization.getAllStaffNames()
+
+    elif(reqType == 10): # Requesting editable staff information
+        if(reqParam in list(StaffWorking.keys())):
+            # Staff is loaded into memory
+            reply = StaffWorking[reqParam]
+        else:
+            reply = ObjectSerialization.loadSingleStaff(reqParam)
+    
+    elif(reqType == 11): # Updating editable staff information
+        # If object is loaded into memory, edit it in memory and save it to the file
+        # If object is not loaded into memory, load it, make changes and save it 
+
+        pass
         
         
     print("Returning {}".format(reply))

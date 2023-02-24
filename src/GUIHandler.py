@@ -4,7 +4,7 @@ from Normies import ITSDStaff
 import random, datetime
 from Constants import *
 from functools import partial # This is pure magic
-import sys
+import sys, time
 
 # TODO: Expand GUI
 
@@ -390,19 +390,7 @@ class LunchRosterMenu(tk.Frame):
 
         self.lunchTimes = {} # Dict of all staff and their lunches 
         self.lunchTimeWidgets = {} # dict of staff name as key and array of label, drop-down widget and stringVar literal of the currently selected option e.g. { "ethan":[tk.label, tk.dropDown, StringVar] }
-        self.lunch_options = [ # All possible lunch times that will show up in the drop down menu
-            None,
-            datetime.time(11, 00).strftime('%I:%M%p'),
-            datetime.time(11, 30).strftime('%I:%M%p'),
-            datetime.time(12, 00).strftime('%I:%M%p'),
-            datetime.time(12, 30).strftime('%I:%M%p'),
-            datetime.time(13, 00).strftime('%I:%M%p'),
-            datetime.time(13, 30).strftime('%I:%M%p'),
-            datetime.time(14, 00).strftime('%I:%M%p'),
-            datetime.time(14, 30).strftime('%I:%M%p'),
-            datetime.time(15, 00).strftime('%I:%M%p'),
-            datetime.time(15, 30).strftime('%I:%M%p')
-        ]
+        self.lunch_options = LUNCH_TIMESLOTS
         
 
         # Set background colour
@@ -642,20 +630,7 @@ class PendingsMenu(tk.Frame):
         self.staffDisplayColCounter = 0 # Two cols  of staff lunch times will be displayed. 
         self.pendingsRoster = {} # Dict of all staff and their pending times, time is None if not selected 
         self.pendingsWidgets = {} # dict of staff name as key and array of label, drop-down widget { "ethan":[tk.label, tk.dropDown] }
-        self.pendings_options = [ # All possible lunch times that will show up in the drop down menu
-            None,
-            datetime.time(8, 00).strftime('%I:%M%p'),
-            datetime.time(9, 00).strftime('%I:%M%p'),
-            datetime.time(10, 00).strftime('%I:%M%p'),
-            datetime.time(11, 00).strftime('%I:%M%p'),
-            datetime.time(12, 00).strftime('%I:%M%p'),
-            datetime.time(13, 00).strftime('%I:%M%p'),
-            datetime.time(14, 00).strftime('%I:%M%p'),
-            datetime.time(15, 00).strftime('%I:%M%p'),
-            datetime.time(16, 00).strftime('%I:%M%p'),
-            datetime.time(17, 00).strftime('%I:%M%p'),
-            datetime.time(18, 00).strftime('%I:%M%p')
-        ]
+        self.pendings_options = PENDINGS_TIMESLOTS
 
         # Set background colour
         self.config(bg=BGND_COL)
@@ -878,6 +853,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.parent = parent # Reference to parent container
         self.controller = controller # Reference to parent object
         self.firstLoad = True # Flag for first time loading of page
+        self.staffList = []
 
         # Set background colour
         self.config(bg=BGND_COL)
@@ -885,8 +861,15 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         # Heading
         self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Staff Management", font = MENU_FONT) 
 
+        # Selectable list of staff members
+        self.staffListDisplay = CreateElement(controller, tk.Listbox, master=self, width = 20, height = 24, font = STD_FONT)
+        self.staffLoadButton = CreateElement(controller, tk.Button, master=self, text = "LOAD", font=API_BTN_FONT, command=self.loadSelected)
+        
+
         # Prev page button
         self.closeButton = CreateElement(controller, tk.Button, master=self, text="X", font = MENU_FONT, width=2, command = lambda:controller.show_frame(None))
+
+
 
     
     def onFirstLoad(self):
@@ -901,20 +884,46 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
     def clear(self):
         self.pageLabel.place_forget()
         self.closeButton.place_forget()
+        self.staffListDisplay.place_forget()
+        self.staffLoadButton.place_forget()
 
 
     # Renders all UI Elements
     def draw(self):
 
         self.config(bg=BGND_COL)
-
+        
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
 
+
+        self.staffListDisplay.delete(0, tk.END)
+        self.staffList = self.controller.messageToMain(9)
+        self.staffListDisplay.config(bg=BGND_COL, fg=TEXT_COL)
+        self.staffLoadButton.config(bg=BGND_COL, fg=BTN_COL)
+
+        for staffName in self.staffList:
+            self.staffListDisplay.insert(tk.END, staffName)
+
+
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
         self.closeButton.place(x = 20, y = 20)
+        self.staffListDisplay.place(x = 55, y = 75)
+        self.staffLoadButton.place(x = 110, y = 520)
+
+    # Function that runs continuously on a separate thread to poll which staff member is selected to manage and loads their information to view/edit
+    def loadSelected(self):
+        # This runs every 0.5 seconds on a separate thread currently 
+        selectedIndex = self.staffListDisplay.curselection()
+        selectedStaffName = self.staffList[selectedIndex]
+        print("Selected: {}".format(selectedStaffName))
+
+
+
+        self.clear()
+        self.draw()
 
 
 

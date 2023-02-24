@@ -114,3 +114,13 @@ def saveMultipleStaff(staffDetailsArray):
 
 if __name__ == "__main__":
     print(__loadStaffObject("Ethan"))
+
+
+def getAllStaffNames():
+    allStaffFiles = os.listdir(objectsFP)
+
+    # Loop through each file in directory
+    for iter, key  in enumerate(allStaffFiles):
+        allStaffFiles[iter] = key.replace(".sus", "")
+
+    return allStaffFiles
