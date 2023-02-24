@@ -959,7 +959,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         # Read variables from widgets into object memory
 
         # Tell main to store changes to the object 
-        self.controller.messageToMain( (11, self.selectedStaff) )
+        self.controller.messageToMain( 11, self.selectedStaff )
 
 
 
