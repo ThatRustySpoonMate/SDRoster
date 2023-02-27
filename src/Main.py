@@ -126,13 +126,17 @@ def messageFromGUI(reqType, reqParam = 0):
     elif(reqType == 11): # Updating editable staff information
         
         if(reqParam.full_name in list(StaffWorking.keys())):
+            print("Already loaded into memory")
             # If object is loaded into memory, edit it in memory and save it to the file
             StaffWorking[reqParam.full_name].copy_constructor(reqParam)
+            print(StaffWorking[reqParam.full_name].full_name)
             ObjectSerialization.saveSingleStaff(StaffWorking[reqParam.full_name])
         else:
             # If object is not loaded into memory, load it, make changes and save it 
-            thisStaff = ObjectSerialization.loadSingleStaff(reqParam.full_name)
+            print("Not loaded into memory")
+            thisStaff = ObjectSerialization.loadSingleStaff([reqParam.full_name])
             thisStaff.copy_constructor(reqParam)
+            print(thisStaff.full_name)
             ObjectSerialization.saveSingleStaff(thisStaff)
 
     elif(reqType == 12): # Request to delete a staff members data file

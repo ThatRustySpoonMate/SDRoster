@@ -1044,7 +1044,11 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.selectedStaff.chat_competency = int(self.chatCompetencyVar.get()[:1] )
         self.selectedStaff.on_chat = self.chatCapableVar.get()
 
-        self.selectedStaff.set_lunchtime = convertStringTimeToDateTime(self.prefLunchVar.get())
+        # Check for None 
+        if(self.prefLunchVar.get() != "None"):
+            self.selectedStaff.set_lunchtime = convertStringTimeToDateTime(self.prefLunchVar.get())
+        else:
+            self.selectedStaff.set_lunchtime = None
 
         # Tell main to store changes to the object 
         self.controller.messageToMain( 11, self.selectedStaff )

@@ -44,7 +44,6 @@ def __loadStaffObject(staffName):
 # Private function 
 def __saveStaffObject(staffObj):
     # If file does not exist for staff member, create it
-
     # Load the object of the requested staff member, if it does not exist, create it
     allStaffFiles = os.listdir(objectsFP)
 
@@ -53,6 +52,8 @@ def __saveStaffObject(staffObj):
     for fileName in allStaffFiles:
         if(staffObj.full_name in fileName):
             found = True
+
+    
 
     if(found):
         # Save object to corresponding file
@@ -72,13 +73,16 @@ def __saveStaffObject(staffObj):
 #				[1] - Shift start time - %Y-%m-%d%I:%M%p format -- optional
 #				[2] - Shift End time - %Y-%m-%d%I:%M%p format   -- optional
 def loadSingleStaff(staffDetails):
+    
     staffObj = __loadStaffObject(staffDetails[0])
 
     if(staffObj != None):
         # If file exists, and we have loaded an object, return it 
+        print("File already exists")
         return staffObj
     else:
         # If no file exists, create the object anew and save it to the newly created file
+        print("File Doesn't exist, creating it... {}".format(staffDetails[0]))
         newStaff = ITSDStaff(staffDetails[0])
         __saveStaffObject(newStaff)
         return newStaff 
