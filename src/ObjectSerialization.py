@@ -162,7 +162,7 @@ def outputToJson(staffWorking):
     jsonInput = {}
 
     for staffName, staffObj in staffWorking.items():
-        jsonInput[staffName] = staffObj.set_lunchtime.strftime('%I:%M%p')
+        jsonInput[staffName] = staffObj.actual_lunchtime.strftime('%I:%M%p')
 
     jsonOutput = json.dumps(jsonInput, indent=4) 
 
