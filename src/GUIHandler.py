@@ -749,9 +749,11 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.hamburgerOpenIconDark = tk.PhotoImage(file = "{}HamburgerOpenDark.png".format(UI_FOLDER))
         self.HamburgerMenuBtn = tk.Button(master=self, highlightthickness = 0, relief=tk.FLAT, bd=0, command=self.controller.toggleHamburgerMenu)
 
-
         # Heading
         self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Finalisation", font = MENU_FONT) #tk.Label(self, text="Home Page", font = STD_FONT, fg = controller.fontCol) 
+
+        # Finalize button
+        self.finalizeButton = tk.Button(self, text = "Finalize", font = STD_FONT, command=self.storeRosterJson)
 
         # Navigation buttons
         self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(PendingsMenu))
@@ -762,13 +764,13 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.draw()
 
         self.firstLoad = False
-        pass
 
 
     # Removes all UI elements
     def clear(self):
         self.pageLabel.place_forget()
         self.prevButton.place_forget()
+        self.finalizeButton.place_forget()
 
 
     # Renders all UI Elements
@@ -779,6 +781,7 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.finalizeButton.config(bg = BGND_COL, fg=BTN_COL)
 
         if(self.controller.darkMode == 0):
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconLight) 
@@ -788,6 +791,13 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
         self.prevButton.place(x = 20, y = WINDOW_HEIGHT - 50)
+        self.finalizeButton.place(x = WINDOW_WIDTH / 2 - 25, y = WINDOW_HEIGHT - 50)
+
+    
+    def storeRosterJson(self):
+        self.controller.messageToMain(20, None)
+        pass
+
 
 
 
@@ -919,7 +929,6 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.chatCapableLabel.place_forget()
         self.chatCapableButton.place_forget()
         
-
 
     # Renders all UI Elements
     def draw(self):

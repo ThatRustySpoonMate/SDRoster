@@ -1,9 +1,12 @@
-import pickle, os # Used for serializing staff to files as well as converting serialized files to staff objects
+import pickle, os, json, datetime# Used for serializing staff to files as well as converting serialized files to staff objects
 from Normies import ITSDStaff
 
 
+
 objectsFP = "{}//data//".format(os.getcwd())
+JSONFP = "{}//integrations//roster.json".format(os.getcwd())
 FILE_EXT = ".sus"
+
 
 # Make sure param1 is full name from the staff object
 # Private func
@@ -124,3 +127,18 @@ def getAllStaffNames():
         allStaffFiles[iter] = key.replace(".sus", "")
 
     return allStaffFiles
+
+
+def outputToJson(staffWorking):
+    rosterFile = open(JSONFP, 'w')
+
+    jsonInput = {}
+
+    for staffName, staffObj in staffWorking.items():
+        jsonInput[staffName] = staffObj.set_lunchtime.strftime('%I:%M%p')
+
+    jsonOutput = json.dumps(jsonInput, indent=4) 
+
+    rosterFile.write(jsonOutput)
+
+    rosterFile.close()

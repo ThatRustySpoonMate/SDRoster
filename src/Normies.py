@@ -18,13 +18,15 @@ class ITSDStaff():
 			self.__copy_constructor(origin)
 		else:
 			self.full_name = full_name
+			self.pending_competency = pending_competency
 			self.chat_weight = chat_weight
 			self.chat_competency = chat_competency
-			self.pending_competency = pending_competency
-			self.on_chat = on_chat
+			self.on_chat = on_chat # Toggle for eligible for chat today
 			self.chat_priority = False
-			self.preferred_lunchtime = preferred_lunchtime
-			self.actual_lunchtime = actual_lunchtime
+
+			# Changes day-by-day
+			self.set_lunchtime = actual_lunchtime
+			self.set_chat = False
 
 		
 	# Copy constructor 
@@ -36,7 +38,8 @@ class ITSDStaff():
 		self.on_chat = origin.on_chat
 		self.chat_priority = origin.chat_priority
 		self.preferred_lunchtime = origin.preferred_lunchtime
-		self.actual_lunchtime = origin.actual_lunchtime
+		self.set_lunchtime = origin.set_lunchtime
+		self.set_chat = origin.set_chat
 
 	
 	# increments chat weight proportional to the employee's chat competency so that more experienced people are more likely to be on chat

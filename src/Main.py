@@ -48,10 +48,13 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = APIKeyHandler.retrieveFromWeb()
         
     elif(reqType == 2): # Request for lunch roster output
-
         lunchSlots = LunchGenerator.GetLunchSlots(LunchWeightsDict, LunchStart, LunchEnd, NumStaff)
 
         reply = LunchGenerator.GetStaffLunches(lunchSlots, ShiftData)
+
+        # Apply lunches to staff objects
+        for staffName in list(reply.keys()):
+            StaffWorking[staffName].set_lunchtime = reply[staffName]
         
     elif(reqType == 3): # Change assigned lunch
         try:
@@ -95,12 +98,13 @@ def messageFromGUI(reqType, reqParam = 0):
             # Update the staff member's chat status in their staff member object
             staffName = reqParam[0]
             chatFlag = reqParam[1]
-            StaffWorking[staffName].on_chat = chatFlag
+            StaffWorking[staffName].set_chat = chatFlag
             # If successful
             reply = GUIHandler.SUCCESS
         except Exception as exc:
             #If unsuccessful
             reply = GUIHandler.NOSUCCESS
+        
     
     elif(reqType == 8): # Change assigned pendings
         # Update the staff member's pending time in their staff member object
@@ -124,6 +128,15 @@ def messageFromGUI(reqType, reqParam = 0):
         # If object is not loaded into memory, load it, make changes and save it 
 
         pass
+    
+
+    elif(reqType == 20): # Finalize roster
+        try:
+            ObjectSerialization.outputToJson(StaffWorking)
+            return GUIHandler.SUCCESS
+        except:
+            return GUIHandler.NOSUCCESS
+
         
         
     print("Returning {}".format(reply))
@@ -145,6 +158,7 @@ if __name__ == "__main__":
     NumStaff = 0 # Number of staff working on selected date
     ShiftData = [] # Return from get_shift_data function
     StaffWorking = {} # Array of all the objects corresponding to staff that are working today, key is staffname, value is object
+
     
     LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
 
