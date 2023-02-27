@@ -48,10 +48,13 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = APIKeyHandler.retrieveFromWeb()
         
     elif(reqType == 2): # Request for lunch roster output
-
         lunchSlots = LunchGenerator.GetLunchSlots(LunchWeightsDict, LunchStart, LunchEnd, NumStaff)
 
         reply = LunchGenerator.GetStaffLunches(lunchSlots, ShiftData)
+
+        # Apply lunches to staff objects
+        for staffName in list(reply.keys()):
+            StaffWorking[staffName].actual_lunchtime = reply[staffName]
         
     elif(reqType == 3): # Change assigned lunch
         try:
@@ -95,16 +98,56 @@ def messageFromGUI(reqType, reqParam = 0):
             # Update the staff member's chat status in their staff member object
             staffName = reqParam[0]
             chatFlag = reqParam[1]
-            StaffWorking[staffName].on_chat = chatFlag
+            StaffWorking[staffName].set_chat = chatFlag
             # If successful
             reply = GUIHandler.SUCCESS
         except Exception as exc:
             #If unsuccessful
             reply = GUIHandler.NOSUCCESS
+        
     
     elif(reqType == 8): # Change assigned pendings
         # Update the staff member's pending time in their staff member object
         reply = GUIHandler.SUCCESS
+    
+    elif(reqType == 9): # Requesting list of staff names in data file
+        reply = ObjectSerialization.getAllStaffNames()
+
+    elif(reqType == 10): # Requesting editable staff information of one staff member (as an object)
+        reply = ObjectSerialization.loadSingleStaff(reqParam)
+        """
+        if(reqParam in list(StaffWorking.keys())):
+            # Staff is loaded into memory
+            reply = StaffWorking[reqParam]
+        else:
+            reply = ObjectSerialization.loadSingleStaff(reqParam)
+        """
+    
+    elif(reqType == 11): # Updating editable staff information
+        
+        if(reqParam.full_name in list(StaffWorking.keys())):
+            # If object is loaded into memory, edit it in memory and save it to the file
+            StaffWorking[reqParam.full_name].copy_constructor(reqParam)
+            print(StaffWorking[reqParam.full_name].full_name)
+            ObjectSerialization.saveSingleStaff(StaffWorking[reqParam.full_name])
+        else:
+            # If object is not loaded into memory, load it, make changes and save it 
+            thisStaff = ObjectSerialization.loadSingleStaff([reqParam.full_name])
+            thisStaff.copy_constructor(reqParam)
+            print(thisStaff.full_name)
+            ObjectSerialization.saveSingleStaff(thisStaff)
+
+    elif(reqType == 12): # Request to delete a staff members data file
+        reply = ObjectSerialization.deleteStaff(reqParam)
+
+
+    elif(reqType == 20): # Finalize roster
+        try:
+            ObjectSerialization.outputToJson(StaffWorking)
+            return GUIHandler.SUCCESS
+        except:
+            return GUIHandler.NOSUCCESS
+
         
         
     print("Returning {}".format(reply))
@@ -119,13 +162,14 @@ if __name__ == "__main__":
     # Load in config data
     LunchStart = ConfigInterface.readValue("lunchStart")
     LunchEnd = ConfigInterface.readValue("lunchEnd")
-    LunchWeights = ConfigInterface.readValue("lunchWeights").split(",")
+    LunchWeights = ConfigInterface.readValue("lunchWeightsDefault").split(",")
     LunchSlotTimes = convertToDateTime(ConfigInterface.readValue("lunchSlotTimes").split(","), RosterDate )
     ShiftTypes = ConfigInterface.readValue("shiftTypes").split(",")
 
     NumStaff = 0 # Number of staff working on selected date
     ShiftData = [] # Return from get_shift_data function
     StaffWorking = {} # Array of all the objects corresponding to staff that are working today, key is staffname, value is object
+
     
     LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
 

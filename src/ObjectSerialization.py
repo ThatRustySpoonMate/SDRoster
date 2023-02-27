@@ -1,9 +1,12 @@
-import pickle, os # Used for serializing staff to files as well as converting serialized files to staff objects
+import pickle, os, json, datetime# Used for serializing staff to files as well as converting serialized files to staff objects
 from Normies import ITSDStaff
 
 
+
 objectsFP = "{}//data//".format(os.getcwd())
+JSONFP = "{}//integrations//roster.json".format(os.getcwd())
 FILE_EXT = ".sus"
+
 
 # Make sure param1 is full name from the staff object
 # Private func
@@ -41,7 +44,6 @@ def __loadStaffObject(staffName):
 # Private function 
 def __saveStaffObject(staffObj):
     # If file does not exist for staff member, create it
-
     # Load the object of the requested staff member, if it does not exist, create it
     allStaffFiles = os.listdir(objectsFP)
 
@@ -50,6 +52,8 @@ def __saveStaffObject(staffObj):
     for fileName in allStaffFiles:
         if(staffObj.full_name in fileName):
             found = True
+
+    
 
     if(found):
         # Save object to corresponding file
@@ -69,14 +73,17 @@ def __saveStaffObject(staffObj):
 #				[1] - Shift start time - %Y-%m-%d%I:%M%p format -- optional
 #				[2] - Shift End time - %Y-%m-%d%I:%M%p format   -- optional
 def loadSingleStaff(staffDetails):
+    
     staffObj = __loadStaffObject(staffDetails[0])
 
     if(staffObj != None):
         # If file exists, and we have loaded an object, return it 
+        print("File already exists")
         return staffObj
     else:
         # If no file exists, create the object anew and save it to the newly created file
-        newStaff = ITSDStaff(staffDetails[0], 1, 0, 0, 0, None, None) # Maybe change default behaviour for new staff?
+        print("File Doesn't exist, creating it... {}".format(staffDetails[0]))
+        newStaff = ITSDStaff(staffDetails[0])
         __saveStaffObject(newStaff)
         return newStaff 
 
@@ -110,6 +117,60 @@ def saveMultipleStaff(staffDetailsArray):
        status.append(__saveStaffObject(staffObj) )
     
     return status
+
+
+def deleteStaff(staffName):
+
+    allStaffFiles = os.listdir(objectsFP)
+
+    # Search for the .sus file
+    found = False
+    for fileName in allStaffFiles:
+        if(staffName in fileName):
+            found = True
+
+
+    if(found):
+        # File is present, try to delete it 
+        try:
+            # Construct path to file and delete it
+            inputFilePath = objectsFP + staffName + FILE_EXT
+            os.remove(inputFilePath)
+            return True
+        except:
+            # Unable to delete file
+            return False
+    else:
+        # Unable to find file
+        False
+
+
+
+def getAllStaffNames():
+    allStaffFiles = os.listdir(objectsFP)
+
+    # Loop through each file in directory
+    for iter, key  in enumerate(allStaffFiles):
+        allStaffFiles[iter] = key.replace(".sus", "")
+
+    return allStaffFiles
+
+
+def outputToJson(staffWorking):
+    rosterFile = open(JSONFP, 'w')
+
+    jsonInput = {}
+
+    for staffName, staffObj in staffWorking.items():
+        jsonInput[staffName] = staffObj.actual_lunchtime.strftime('%I:%M%p')
+
+    jsonOutput = json.dumps(jsonInput, indent=4) 
+
+    rosterFile.write(jsonOutput)
+
+    rosterFile.close()
+
+
 
 
 if __name__ == "__main__":

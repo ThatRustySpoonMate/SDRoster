@@ -58,6 +58,7 @@ def get_shift_data(shift_types, date, api_token = ""):
 		# returned without errors
 		if api_response.status_code == 200:
 			formatted_shift_data = trim_data(raw_shift_data, selected_date, shift_types)
+			
 
 			if not formatted_shift_data:
 				print("No shifts after formatting raw shift data")

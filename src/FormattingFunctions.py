@@ -26,3 +26,17 @@ def convertToDateTime(timeList, thisDate=datetime.datetime.today().date()):
         output.append( datetime.datetime(thisDate.year, thisDate.month, thisDate.day, int(time.split(":")[0]), int(time.split(":")[1])) )
 
     return output
+
+
+# param1: string time
+#   e.g. "01:00PM"
+#   output: datetime.time(13, 00)
+def convertStringTimeToDateTime(stringTime):
+
+    hr = int(stringTime.split(":")[0][:2])
+    min = int(stringTime.split(":")[1][:2])
+
+    if("pm" in stringTime.lower() and hr != 12):
+        hr += 12
+
+    return datetime.time(hr, min)
