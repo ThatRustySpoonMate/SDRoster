@@ -3,3 +3,4 @@ Add lunch weighting presets to config page (+deafults)
 --Save changes to staff objects
 Handle extended hours Support
 Add context helper widgets to describe certain actions in the GUI (such as deleting staff)
+Scroll menu for lunch roster

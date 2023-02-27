@@ -1031,6 +1031,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
             self.prefLunchVar.set(self.selectedStaff.set_lunchtime.strftime('%I:%M%p')) # Set this variable to this staff members allocated lunch time
         else:
             self.prefLunchVar.set(None)
+
         self.prefLunchDropDown = tk.OptionMenu(self, self.prefLunchVar, *LUNCH_TIMESLOTS)
 
 
@@ -1040,9 +1041,11 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
     def saveChanges(self):
         # Read variables from widgets into object memory
-        self.selectedStaff.chat_weighting = self.chatWeightingInput.get(1.0, tk.END)
+        self.selectedStaff.chat_weight = self.chatWeightingInput.get(1.0, tk.END)
         self.selectedStaff.chat_competency = int(self.chatCompetencyVar.get()[:1] )
         self.selectedStaff.on_chat = self.chatCapableVar.get()
+        self.selectedStaff.email_address = self.emailAddressInput.get(1.0, tk.END)
+        self.selectedStaff.humanityID = self.humanityIDInput.get(1.0, tk.END)
 
         # Check for None 
         if(self.prefLunchVar.get() != "None"):
@@ -1067,9 +1070,6 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         
         self.clear()
         self.draw()
-
-
-        
 
 
 
