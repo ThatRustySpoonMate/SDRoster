@@ -1027,7 +1027,10 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.selectedStaff = self.controller.messageToMain(10, [selectedStaffName] )
 
         self.selectedStaffLabel.config(bg=BGND_COL, fg=TEXT_COL, text=selectedStaffName)
-        self.prefLunchVar.set(self.selectedStaff.set_lunchtime) # Set this variable to this staff members allocated lunch time
+        if(self.selectedStaff.set_lunchtime != None):
+            self.prefLunchVar.set(self.selectedStaff.set_lunchtime.strftime('%I:%M%p')) # Set this variable to this staff members allocated lunch time
+        else:
+            self.prefLunchVar.set(None)
         self.prefLunchDropDown = tk.OptionMenu(self, self.prefLunchVar, *LUNCH_TIMESLOTS)
 
 

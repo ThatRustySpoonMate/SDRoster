@@ -137,7 +137,6 @@ def messageFromGUI(reqType, reqParam = 0):
 
     elif(reqType == 12): # Request to delete a staff members data file
         reply = ObjectSerialization.deleteStaff(reqParam)
-    
 
 
     elif(reqType == 20): # Finalize roster
