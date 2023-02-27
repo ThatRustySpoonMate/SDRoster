@@ -79,7 +79,7 @@ def loadSingleStaff(staffDetails):
         return staffObj
     else:
         # If no file exists, create the object anew and save it to the newly created file
-        newStaff = ITSDStaff(staffDetails[0], 1, 0, 0, 0, None, None) # Maybe change default behaviour for new staff?
+        newStaff = ITSDStaff(staffDetails[0])
         __saveStaffObject(newStaff)
         return newStaff 
 
@@ -115,8 +115,31 @@ def saveMultipleStaff(staffDetailsArray):
     return status
 
 
-if __name__ == "__main__":
-    print(__loadStaffObject("Ethan"))
+def deleteStaff(staffName):
+
+    allStaffFiles = os.listdir(objectsFP)
+
+    # Search for the .sus file
+    found = False
+    for fileName in allStaffFiles:
+        if(staffName in fileName):
+            found = True
+
+
+    if(found):
+        # File is present, try to delete it 
+        try:
+            # Construct path to file and delete it
+            inputFilePath = objectsFP + staffName + FILE_EXT
+            os.remove(inputFilePath)
+            return True
+        except:
+            # Unable to delete file
+            return False
+    else:
+        # Unable to find file
+        False
+
 
 
 def getAllStaffNames():
@@ -142,3 +165,9 @@ def outputToJson(staffWorking):
     rosterFile.write(jsonOutput)
 
     rosterFile.close()
+
+
+
+
+if __name__ == "__main__":
+    print(__loadStaffObject("Ethan"))

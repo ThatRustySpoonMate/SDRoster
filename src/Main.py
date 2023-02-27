@@ -54,7 +54,7 @@ def messageFromGUI(reqType, reqParam = 0):
 
         # Apply lunches to staff objects
         for staffName in list(reply.keys()):
-            StaffWorking[staffName].set_lunchtime = reply[staffName]
+            StaffWorking[staffName].actual_lunchtime = reply[staffName]
         
     elif(reqType == 3): # Change assigned lunch
         try:
@@ -113,7 +113,7 @@ def messageFromGUI(reqType, reqParam = 0):
     elif(reqType == 9): # Requesting list of staff names in data file
         reply = ObjectSerialization.getAllStaffNames()
 
-    elif(reqType == 10): # Requesting editable staff information (object)
+    elif(reqType == 10): # Requesting editable staff information of one staff member (as an object)
         reply = ObjectSerialization.loadSingleStaff(reqParam)
         """
         if(reqParam in list(StaffWorking.keys())):
@@ -124,11 +124,21 @@ def messageFromGUI(reqType, reqParam = 0):
         """
     
     elif(reqType == 11): # Updating editable staff information
-        # If object is loaded into memory, edit it in memory and save it to the file
-        # If object is not loaded into memory, load it, make changes and save it 
+        
+        if(reqParam.full_name in list(StaffWorking.keys())):
+            # If object is loaded into memory, edit it in memory and save it to the file
+            StaffWorking[reqParam.full_name].copy_constructor(reqParam)
+            ObjectSerialization.saveSingleStaff(StaffWorking[reqParam.full_name])
+        else:
+            # If object is not loaded into memory, load it, make changes and save it 
+            thisStaff = ObjectSerialization.loadSingleStaff(reqParam.full_name)
+            thisStaff.copy_constructor(reqParam)
+            ObjectSerialization.saveSingleStaff(thisStaff)
 
-        pass
+    elif(reqType == 12): # Request to delete a staff members data file
+        reply = ObjectSerialization.deleteStaff(reqParam)
     
+
 
     elif(reqType == 20): # Finalize roster
         try:
@@ -151,7 +161,7 @@ if __name__ == "__main__":
     # Load in config data
     LunchStart = ConfigInterface.readValue("lunchStart")
     LunchEnd = ConfigInterface.readValue("lunchEnd")
-    LunchWeights = ConfigInterface.readValue("lunchWeights").split(",")
+    LunchWeights = ConfigInterface.readValue("lunchWeightsDefault").split(",")
     LunchSlotTimes = convertToDateTime(ConfigInterface.readValue("lunchSlotTimes").split(","), RosterDate )
     ShiftTypes = ConfigInterface.readValue("shiftTypes").split(",")
 

@@ -5,6 +5,7 @@ import random, datetime
 from Constants import *
 from functools import partial # This is pure magic
 import sys, time
+from FormattingFunctions import *
 
 # TODO: Expand GUI
 
@@ -876,26 +877,34 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.staffListDisplay = CreateElement(controller, tk.Listbox, master=self, width = 20, height = 24, font = STD_FONT)
         self.staffLoadButton = CreateElement(controller, tk.Button, master=self, text = "LOAD", font=API_BTN_FONT, command=self.loadSelected)
         self.staffSaveButton = CreateElement(controller, tk.Button, master=self, text = "SAVE", font=API_BTN_FONT, command=self.saveChanges)
+        self.staffDeleteButton = CreateElement(controller, tk.Button, master=self, text = "DELETE", font=API_BTN_FONT, command = self.deleteSelected)
 
         # Staff Object Parameters
         self.selectedStaffLabel = CreateElement(self.controller, tk.Label, master=self, font = HEADING_FONT)
 
         self.prefLunchLabel= CreateElement(self.controller, tk.Label, master=self, text = "Preferred Lunch", font=DROP_DOWN_LABEL_FONT) 
-        self.prefLunchVar = tk.StringVar() # Create rkinter variable for the selected drop-down value
+        self.prefLunchVar = tk.StringVar() # Create tkinter variable for the selected drop-down value
         self.prefLunchVar.set(None)
         self.prefLunchDropDown = tk.OptionMenu(self, self.prefLunchVar, *LUNCH_TIMESLOTS)
 
-        self.chatWeightingLabel = CreateElement(self.controller, tk.Label, master=self, text = "Chat weighting", font=DROP_DOWN_LABEL_FONT) 
-        self.chatWeightingInput = tk.Text(self, width = 3, height = 1, font=STD_FONT)
-
         self.chatCompetencyLabel = CreateElement(self.controller, tk.Label, master=self, text = "Chat competency", font=DROP_DOWN_LABEL_FONT) 
-        self.chatCompetencyVar = tk.StringVar()
+        self.chatCompetencyVar = tk.StringVar() # Supports up to ten chat competency options
         self.chatCompetencyVar.set(None)
         self.chatCompetencyDropDown = tk.OptionMenu(self, self.chatCompetencyVar, *CHAT_COMPETENCIES)
 
         self.chatCapableLabel = CreateElement(self.controller, tk.Label, master=self, text = "Chat capable", font=DROP_DOWN_LABEL_FONT) 
         self.chatCapableVar = tk.IntVar() # Variable to store status of checkbox (0/1)
         self.chatCapableButton = tk.Checkbutton(self, variable = self.chatCapableVar)
+
+        self.chatWeightingLabel = CreateElement(self.controller, tk.Label, master=self, text = "Chat weighting", font=DROP_DOWN_LABEL_FONT) 
+        self.chatWeightingInput = tk.Text(self, width = 3, height = 1, font=STD_FONT)
+
+        self.emailAddressLabel = CreateElement(self.controller, tk.Label, master=self, text = "Email", font=DROP_DOWN_LABEL_FONT) 
+        self.emailAddressInput = tk.Text(self, width = 14, height = 1, font=STD_FONT)
+
+        self.humanityIDLabel = CreateElement(self.controller, tk.Label, master=self, text = "Humanity ID", font=DROP_DOWN_LABEL_FONT) 
+        self.humanityIDInput = tk.Text(self, width = 14, height = 1, font=STD_FONT)
+        
         
 
         # Prev page button
@@ -928,9 +937,14 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.chatCompetencyDropDown.place_forget()
         self.chatCapableLabel.place_forget()
         self.chatCapableButton.place_forget()
+        self.staffDeleteButton.place_forget()
+        self.emailAddressLabel.place_forget()
+        self.emailAddressInput.place_forget()
+        self.humanityIDLabel.place_forget()
+        self.humanityIDInput.place_forget()
         
 
-    # Renders all UI Elements
+    # Renders all UI Elements and configures their colour scheme to match dark mode settings
     def draw(self):
 
         self.config(bg=BGND_COL)
@@ -939,9 +953,13 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
         self.staffSaveButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.staffList = self.controller.messageToMain(9)
+        self.staffList = self.controller.messageToMain(9) # Get list of staff member data files
         self.staffListDisplay.config(bg=BGND_COL, fg=TEXT_COL)
         self.staffLoadButton.config(bg=BGND_COL, fg=BTN_COL)
+        self.staffDeleteButton.config(bg=BGND_COL, fg=BTN_COL)
+        self.emailAddressLabel.config(bg=BGND_COL, fg=TEXT_COL)
+        self.humanityIDLabel.config(bg=BGND_COL, fg=TEXT_COL)
+        self.chatCapableButton.config(bg=BGND_COL)
 
         self.staffListDisplay.delete(0, tk.END)
 
@@ -963,30 +981,43 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         if(self.selectedStaff != None):
             self.chatCapableVar.set(self.selectedStaff.on_chat)
             self.chatCompetencyVar.set( CHAT_COMPETENCIES[self.selectedStaff.chat_competency] )
+
             self.chatWeightingInput.delete(1.0, tk.END)
             self.chatWeightingInput.insert(tk.END, self.selectedStaff.chat_weight)
-        
-        
 
+            self.emailAddressInput.delete(1.0, tk.END)
+            self.emailAddressInput.insert(tk.END, self.selectedStaff.email_address)
+
+            self.humanityIDInput.delete(1.0, tk.END)
+            self.humanityIDInput.insert(tk.END, self.selectedStaff.humanityID)
+        
+        
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
         self.closeButton.place(x = 10, y = 10)
         self.staffListDisplay.place(x = 55, y = 75)
-        self.staffLoadButton.place(x = 110, y = WINDOW_HEIGHT - 85)
+        self.staffLoadButton.place(x = 70, y = WINDOW_HEIGHT - 85)
+        self.staffDeleteButton.place(x = 130, y = WINDOW_HEIGHT - 85)
 
         if(self.selectedStaff != None):
             # We have loaded a staff member to edit
-                self.selectedStaffLabel.place(x = WINDOW_WIDTH / 2 + 150 - (6* len(self.selectedStaff.full_name) ), y = HEADING_Y + 50)
+                self.selectedStaffLabel.place(x = WINDOW_WIDTH / 2 + 150 - (6* len(self.selectedStaff.full_name) ), y = HEADING_Y + 45)
                 self.prefLunchLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 80)
                 self.prefLunchDropDown.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 80)
                 self.staffSaveButton.place(x = WINDOW_WIDTH / 2 + 120, y = WINDOW_HEIGHT - 85)
 
-                self.chatWeightingLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 120)
-                self.chatWeightingInput.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 124)
-                self.chatCompetencyLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 160)
-                self.chatCompetencyDropDown.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 160)
-                self.chatCapableLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 200)
-                self.chatCapableButton.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 200)
+                self.chatCompetencyLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 120)
+                self.chatCompetencyDropDown.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 120)
+                self.chatCapableLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 160)
+                self.chatCapableButton.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 160)
+
+                self.chatWeightingLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 200)
+                self.chatWeightingInput.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 204)
+
+                self.emailAddressLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 240)
+                self.emailAddressInput.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 240)
+                self.humanityIDLabel.place(x = WINDOW_WIDTH / 2 + 5, y = HEADING_Y + 280)
+                self.humanityIDInput.place(x = WINDOW_WIDTH / 2 + 150, y = HEADING_Y + 280)
 
     # Function that runs continuously on a separate thread to poll which staff member is selected to manage and loads their information to view/edit
     def loadSelected(self):
@@ -996,7 +1027,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.selectedStaff = self.controller.messageToMain(10, [selectedStaffName] )
 
         self.selectedStaffLabel.config(bg=BGND_COL, fg=TEXT_COL, text=selectedStaffName)
-        self.prefLunchVar.set(self.selectedStaff.preferred_lunchtime) # Set this variable to this staff members allocated lunch time
+        self.prefLunchVar.set(self.selectedStaff.set_lunchtime) # Set this variable to this staff members allocated lunch time
         self.prefLunchDropDown = tk.OptionMenu(self, self.prefLunchVar, *LUNCH_TIMESLOTS)
 
 
@@ -1006,9 +1037,32 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
     def saveChanges(self):
         # Read variables from widgets into object memory
+        self.selectedStaff.chat_weighting = self.chatWeightingInput.get(1.0, tk.END)
+        self.selectedStaff.chat_competency = int(self.chatCompetencyVar.get()[:1] )
+        self.selectedStaff.on_chat = self.chatCapableVar.get()
+
+        self.selectedStaff.set_lunchtime = convertStringTimeToDateTime(self.prefLunchVar.get())
 
         # Tell main to store changes to the object 
         self.controller.messageToMain( 11, self.selectedStaff )
+
+    
+    def deleteSelected(self):
+        userConfirmation = True
+
+        selectedIndex = self.staffListDisplay.curselection()[0]
+        selectedStaffName = self.staffList[selectedIndex]
+
+        userConfirmation = messagebox.askyesno("Delete user {}".format(selectedStaffName), "You are about to delete {}'s profile\nThis will remove their profile and cause it to load with default settings the next time they are rostered and this program is ran. \nAre you sure?".format(selectedStaffName))
+        
+        if(userConfirmation):
+            self.controller.messageToMain(12, selectedStaffName) # This returns status as a bool
+        
+        self.clear()
+        self.draw()
+
+
+        
 
 
 

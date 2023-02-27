@@ -12,33 +12,41 @@
 # set_lunchtime 	- this is the set lunch time for an employee, this can be due to an agreed upon situation, or an agreed upon standard lunch time
 
 class ITSDStaff():
-	def __init__(self, full_name, chat_weight, chat_competency, pending_competency, on_chat, preferred_lunchtime, actual_lunchtime, origin = None):
-		
+	def __init__(self, full_name, chat_weight=1, chat_competency=0, pending_competency=0, on_chat=0, set_lunchtime=None, actual_lunchtime=None, email_address="temp@email.com", humanityID = "-1", origin = None):
+
 		if(origin != None): # Copy Constructor
-			self.__copy_constructor(origin)
+			self.copy_constructor(origin)
 		else:
 			self.full_name = full_name
 			self.pending_competency = pending_competency
 			self.chat_weight = chat_weight
 			self.chat_competency = chat_competency
 			self.on_chat = on_chat # Toggle for eligible for chat today
-			self.chat_priority = False
+			self.chat_priority = False 
+			self.email_address = email_address
+			self.humanityID = humanityID
+			self.set_lunchtime = set_lunchtime # Allocated lunchtime for today
 
 			# Changes day-by-day
-			self.set_lunchtime = actual_lunchtime
-			self.set_chat = False
+			self.actual_lunchtime = actual_lunchtime
+			self.pendings_time = None # Allocated pendings time
+			self.set_chat = False # Flagged for chat today
 
 		
 	# Copy constructor 
-	def __copy_constructor(self, origin):
+	def copy_constructor(self, origin):
 		self.full_name = origin.full_name
 		self.chat_weight = origin.chat_weight
 		self.chat_competency = origin.chat_competency
 		self.pending_competency = origin.pending_competency
 		self.on_chat = origin.on_chat
 		self.chat_priority = origin.chat_priority
-		self.preferred_lunchtime = origin.preferred_lunchtime
 		self.set_lunchtime = origin.set_lunchtime
+		self.email_address = origin.email_address
+		self.humanityID = origin.humanityID
+
+		self.actual_lunchtime = origin.actual_lunchtime
+		self.pendings_time = origin.pendings_time # Allocated pendings time
 		self.set_chat = origin.set_chat
 
 	
