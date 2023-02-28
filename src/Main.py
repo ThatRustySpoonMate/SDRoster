@@ -61,10 +61,10 @@ def messageFromGUI(reqType, reqParam = 0):
             # Update the staff member's lunch time in their staff member object
             staffName = reqParam[0]
             lunchTime = reqParam[1]
-            StaffWorking[staffName].set_lunchtime = lunchTime # Update
+            StaffWorking[staffName].actual_lunchtime = lunchTime
             # If successful
             reply = GUIHandler.SUCCESS
-        except Exception as exc:
+        except:
             #If unsuccessful
             reply = GUIHandler.NOSUCCESS
     
