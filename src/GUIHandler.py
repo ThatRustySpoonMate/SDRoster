@@ -645,13 +645,17 @@ class PendingsMenu(tk.Frame):
         self.HamburgerMenuBtn = tk.Button(master=self, highlightthickness = 0, relief=tk.FLAT, bd=0, command=self.controller.toggleHamburgerMenu)
 
         # Navigation buttons
-        self.nextButton = CreateElement(controller, tk.Button, master=self, text=">", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(FinalizeMenu) )
-        self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(ChatMenu))
+        self.nextButton = CreateElement(controller, tk.Button, master=self, text=">", font = NAV_BTN_FONT, width=2, command = lambda:self.controller.show_frame(FinalizeMenu) )
+        self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:self.controller.show_frame(ChatMenu))
         
     
     def onFirstLoad(self):
         # Request pendings roster from main and store it in member variable
         self.pendingsRoster = self.controller.messageToMain(6).copy()
+
+        for k, v in self.pendingsRoster.items():
+            self.pendingsRoster[k] = v.strftime('%I:%M%p')
+
 
         # Create a label and drop down for each staff member (label) and their lunch times (Drop down)
         for staffName in self.pendingsRoster:
@@ -724,8 +728,17 @@ class PendingsMenu(tk.Frame):
 
     
     def updatePendings(self, staffName, newTime):
+
         print("Updating pendings for {} to {}".format(staffName, newTime))
-        if( self.controller.messageToMain(8, (staffName, newTime)) == NOSUCCESS):
+
+        hr = int(newTime.split(":")[0][:2])
+        min = int(newTime.split(":")[1][:2])
+
+        if("pm" in newTime.lower() and hr != 12):
+            hr += 12
+
+
+        if( self.controller.messageToMain(8, (staffName, datetime.time(hr, min))) == NOSUCCESS):
             # Unable to update lunch time
             messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
 
@@ -753,6 +766,10 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         # Heading
         self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Finalisation", font = MENU_FONT) #tk.Label(self, text="Home Page", font = STD_FONT, fg = controller.fontCol) 
 
+        # Page content
+        self.lunchChatOutput = CreateElement(controller, tk.Text, master=self, width = 60, height = 30, font=FINAL_DSP_FONT)
+        #self.pendingsOutput = CreateElement(controller, tk.Text, master=self, width = 27, height = 30, font=FINAL_DSP_FONT)    
+
         # Finalize button
         self.finalizeButton = tk.Button(self, text = "Finalize", font = STD_FONT, command=self.storeRosterJson)
 
@@ -772,10 +789,14 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.pageLabel.place_forget()
         self.prevButton.place_forget()
         self.finalizeButton.place_forget()
+        self.lunchChatOutput.place_forget()
+        #self.pendingsOutput.place_forget()
 
 
     # Renders all UI Elements
     def draw(self):
+        self.lunchChatOutput.delete(1.0, tk.END)
+        self.lunchChatOutput.insert(tk.END, self.generateEmailText())
 
         self.config(bg=BGND_COL)
 
@@ -783,21 +804,73 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
         self.finalizeButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.lunchChatOutput.config(bg=BGND_COL, fg=TEXT_COL)
+        #self.pendingsOutput.config(bg=BGND_COL, fg=TEXT_COL)
+
+        #self.lunchChatOutput["highlightthickness"] = 0 # Set border size
+        self.lunchChatOutput.config(relief=tk.FLAT) 
+        #self.pendingsOutput["highlightthickness"] = 0 # Set border size  
+        #self.pendingsOutput.config(relief=tk.FLAT)  
 
         if(self.controller.darkMode == 0):
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconLight) 
         else:
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconDark)
 
+        
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
         self.prevButton.place(x = 20, y = WINDOW_HEIGHT - 50)
         self.finalizeButton.place(x = WINDOW_WIDTH / 2 - 25, y = WINDOW_HEIGHT - 50)
+        self.lunchChatOutput.place(x = 80, y = HEADING_Y + 35)
+        #self.pendingsOutput.place(x = 340, y = HEADING_Y + 35)
 
     
     def storeRosterJson(self):
         self.controller.messageToMain(20, None)
         pass
+
+    def generateEmailText(self):
+
+        # Preamble
+        headingText = "*Please let a senior know if there's an issue with your allocated lunch.*\n\n"
+        dateText = "Date: {}\n\n".format(self.controller.messageToMain(13, None).strftime("%d %B, %Y")) # Request date this roster is generated for from Main
+
+        # Create Chat part of email
+        chatHeading = "--Chat Roster--\n"
+        chatBody = ""
+        assignedChatters = self.controller.messageToMain(14, None) # Request names of staff on chats
+        print("Assigned Chatters: {}".format(assignedChatters))
+        for chatEntry in assignedChatters:
+            if(chatEntry[0] == assignedChatters[0][0]):
+                chatBody += "Main - " # First person in array is assigned Main chat
+            else:
+                chatBody += "Backup - " # All others assigned chats are backup
+
+            chatBody += chatEntry[0] + "\n"
+        
+        # Create Lunch part of eamil
+        lunchHeading = "\n\n--Lunch Roster--\n" 
+        lunchBody = ""
+        assignedLunches = self.controller.messageToMain(15, None)
+        print("Assigned Lunches: {}".format(assignedLunches))
+        for time, sNameList in assignedLunches.items():
+            lunchBody += "{}\n{}\n".format(time.strftime('%I:%M%p'), convertListNamesToString(sNameList) )
+
+        
+        # Create pendings part of email
+        assignedPendings = self.controller.messageToMain(16, None)
+        print("Assigned Pendings: {}".format(assignedPendings))
+        pendingsHeading = ""
+        pendingsBody = ""
+        if(assignedPendings != {}):
+            pendingsHeading = "\n--Pendings Roster--\n"
+
+            for time, sNameList in assignedPendings.items():
+                pendingsBody += "{}\n{}\n".format(time.strftime('%I:%M%p'), convertListNamesToString(sNameList) )
+
+
+        return headingText + dateText + chatHeading + chatBody + lunchHeading + lunchBody + pendingsHeading + pendingsBody
 
 
 
@@ -819,6 +892,7 @@ class ConfigurationMenu(tk.Frame):
 
         # Description of page use
         self.pageDescriptor = CreateElement(controller, tk.Label, master=self, text="Enter any exceptions to regular rostering here", font=HEADING_FONT)
+
 
         # Prev page button
         self.closeButton = CreateElement(controller, tk.Button, master=self, text="X", font = MENU_FONT, width=2, command = lambda:controller.show_frame(None))
@@ -848,7 +922,6 @@ class ConfigurationMenu(tk.Frame):
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.pageDescriptor.config(bg=BGND_COL, fg=TEXT_COL)
         self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
-        
 
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 80, y = HEADING_Y)

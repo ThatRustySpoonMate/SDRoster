@@ -13,6 +13,7 @@ NAV_BTN_FONT = ('Helvetica bold', 14)
 API_BTN_FONT = ('Helvetica bold', 13)
 DROP_DOWN_LABEL_FONT = ('Helvetica bold', 13)
 WARN_FONT = ('Helvetica bold', 13)
+FINAL_DSP_FONT = ('Helvetica bold', 10)
 
 # Colours definition
 BLACK = "#000000"

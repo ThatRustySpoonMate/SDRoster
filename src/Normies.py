@@ -17,18 +17,21 @@ class ITSDStaff():
 		if(origin != None): # Copy Constructor
 			self.copy_constructor(origin)
 		else:
+			# Staff Details
 			self.full_name = full_name
+			self.email_address = email_address
+			self.humanityID = humanityID
+
+			# Configuration
 			self.pending_competency = pending_competency
 			self.chat_weight = chat_weight
 			self.chat_competency = chat_competency
 			self.on_chat = on_chat # Toggle for eligible for chat today
 			self.chat_priority = False 
-			self.email_address = email_address
-			self.humanityID = humanityID
-			self.set_lunchtime = set_lunchtime # Allocated lunchtime for today
+			self.set_lunchtime = set_lunchtime  # Preferred lunch time
 
 			# Changes day-by-day
-			self.actual_lunchtime = actual_lunchtime
+			self.actual_lunchtime = actual_lunchtime # Allocated lunchtime for today
 			self.pendings_time = None # Allocated pendings time
 			self.set_chat = False # Flagged for chat today
 

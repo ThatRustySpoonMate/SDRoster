@@ -40,3 +40,14 @@ def convertStringTimeToDateTime(stringTime):
         hr += 12
 
     return datetime.time(hr, min)
+
+# Used by GUI Handler for displaying email
+# param1: list of names e.g. [Ethan Harris, Isaac Kemp, Jack Holton]
+# returns formatted string: "Ethan Harris\nIsaac Kemp\nJack Holton"
+def convertListNamesToString(listIn):
+    reply = ""
+
+    for name in listIn:
+        reply += " - " + name + "\n"
+
+    return reply

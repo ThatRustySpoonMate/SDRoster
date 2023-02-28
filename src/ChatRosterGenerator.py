@@ -2,4 +2,4 @@
 import datetime
 
 def generateChatRoster():
-    return { "Ethan":False, "Isaac":True, "Jack":False }
+    return { "Ethan Harris":False}
