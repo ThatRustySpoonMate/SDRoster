@@ -1,14 +1,50 @@
 {
-    "Kyle Goosen": "11:00AM",
-    "Ramon Ortiz": "11:30AM",
-    "Simon Beveridge": "12:30PM",
-    "Liam McInally": "01:00PM",
-    "Navaratnam Raguram": "01:00PM",
-    "Dean Kilpatrick": "01:30PM",
-    "Ethan Harris": "01:30PM",
-    "Sean Nehmer": "02:00PM",
-    "Isabel Winter-Clinch": "02:30PM",
-    "Isaac Kemp": "03:00PM",
-    "Taylor Ridley": "03:00PM",
-    "Sean Maclean": "03:00PM"
+    "Taylor Ridley": [
+        "11:00AM",
+        "temp@email.com"
+    ],
+    "Ramon Ortiz": [
+        "11:30AM",
+        "temp@email.com"
+    ],
+    "Simon Beveridge": [
+        "12:30PM",
+        "temp@email.com"
+    ],
+    "Sine Hamilton": [
+        "01:00PM",
+        "temp@email.com"
+    ],
+    "Navaratnam Raguram": [
+        "01:00PM",
+        "temp@email.com"
+    ],
+    "Serena Park": [
+        "01:30PM",
+        "temp@email.com"
+    ],
+    "Sean Nehmer": [
+        "01:30PM",
+        "temp@email.com"
+    ],
+    "Ethan Harris": [
+        "02:00PM",
+        "temp@email.com"
+    ],
+    "Sean Maclean": [
+        "02:30PM",
+        "temp@email.com"
+    ],
+    "Liam McInally": [
+        "03:00PM",
+        "bigBoi@test"
+    ],
+    "Isabel Winter-Clinch": [
+        "03:00PM",
+        "temp@email.com"
+    ],
+    "Kyle Goosen": [
+        "03:00PM",
+        "temp@email.com"
+    ]
 }

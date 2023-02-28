@@ -1044,7 +1044,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.selectedStaff.chat_weight = self.chatWeightingInput.get(1.0, tk.END)
         self.selectedStaff.chat_competency = int(self.chatCompetencyVar.get()[:1] )
         self.selectedStaff.on_chat = self.chatCapableVar.get()
-        self.selectedStaff.email_address = self.emailAddressInput.get(1.0, tk.END)
+        self.selectedStaff.email_address = self.emailAddressInput.get(1.0, tk.END).replace("\n", "")
         self.selectedStaff.humanityID = self.humanityIDInput.get(1.0, tk.END)
 
         # Check for None 

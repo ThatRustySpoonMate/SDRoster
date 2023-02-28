@@ -4,3 +4,8 @@ Add lunch weighting presets to config page (+deafults)
 Handle extended hours Support
 Add context helper widgets to describe certain actions in the GUI (such as deleting staff)
 Scroll menu for lunch roster
+Display a graph of each default lunch weighting preset? -- This would be a big flex
+
+
+Optimization:
+Offload loading of staff objects from file onto separate thread when checking API key
