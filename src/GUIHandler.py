@@ -503,16 +503,21 @@ class LunchRosterMenu(tk.Frame):
     def updateLunch(self, staffName, newTime):
         print("Updating lunch for {} to {}".format(staffName, newTime))
 
-        hr = int(newTime.split(":")[0][:2])
-        min = int(newTime.split(":")[1][:2])
+        if(newTime != None):
+            hr = int(newTime.split(":")[0][:2])
+            min = int(newTime.split(":")[1][:2])
 
-        if("pm" in newTime.lower() and hr != 12):
-            hr += 12
+            if("pm" in newTime.lower() and hr != 12):
+                hr += 12
 
-        if( self.controller.messageToMain(3, (staffName, datetime.time(hr, min))) == NOSUCCESS): # Pass back datetime object?
-            # Unable to update lunch time
-            messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
+            if( self.controller.messageToMain(3, (staffName, datetime.time(hr, min))) == NOSUCCESS): # Pass back datetime object
+                # Unable to update lunch time
+                messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
 
+        else:
+            if( self.controller.messageToMain(3, (staffName, None)) == NOSUCCESS): # Pass back datetime object
+                # Unable to update lunch time
+                messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
         return
 
         

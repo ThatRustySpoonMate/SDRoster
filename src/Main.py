@@ -181,8 +181,16 @@ def messageFromGUI(reqType, reqParam = 0):
     elif(reqType == 15): # Requesting dict of names and assigned lunches (from objects)
         reply = {}
         workingDate = None
+        StaffWorkingCopy = StaffWorking.copy()
 
-        workingDict = dict( sorted(StaffWorking.items(), key=lambda item: item[1].actual_lunchtime) ) # Sort dict by timestamp
+        # Strip out NoneType objects 
+        for sName, sObj in StaffWorking.items():
+            print(sName, sObj.actual_lunchtime)
+            if(sObj.actual_lunchtime == None):
+                del StaffWorkingCopy[sName]
+
+
+        workingDict = dict( sorted(StaffWorkingCopy.items(), key=lambda item: item[1].actual_lunchtime) ) # Sort dict by timestamp
         # We need to group together all staff members under the same date, for this we use a dict e.g. { 11:30AM: [Isaac, Ethan]}
         for sName, sObj in workingDict.items():
             # Object has a Lunchtime assigned
@@ -235,7 +243,7 @@ def messageFromGUI(reqType, reqParam = 0):
 
 if __name__ == "__main__":
 
-    RosterDate = datetime.today() # Date that the roster will be generated for
+    RosterDate = datetime.today() # Default date that the roster will be generated for
     
     #RosterDate = datetime(2023, 2, 24, 10, 30, 1)
     # Load in config data
@@ -247,7 +255,7 @@ if __name__ == "__main__":
 
     NumStaff = 0 # Number of staff working on selected date
     ShiftData = [] # Return from get_shift_data function
-    StaffWorking = {} # Array of all the objects corresponding to staff that are working today, key is staffname, value is object
+    StaffWorking = {} # Dict of all the objects corresponding to staff that are working today, key is staffname, value is object
 
     
     LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
