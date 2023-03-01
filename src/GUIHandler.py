@@ -177,6 +177,8 @@ class MainMenu(tk.Frame):
     def onFirstLoad(self):
         # Draw all UI elements to screen
 
+        self.toggleDarkMode() # Start in dark mode 
+
         self.draw()
 
         self.firstLoad = False
@@ -600,8 +602,8 @@ class ChatMenu(tk.Frame):
         increment = 0
         for staffName in self.chatWidgets:
 
-            self.chatWidgets[staffName][0].place(x = (staffDisplayCol0 - (10*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 - (10*len(staffName))), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
-            self.chatWidgets[staffName][1].place(x = (staffDisplayCol0 + staffDisplayDrpDwnOffset) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 + staffDisplayDrpDwnOffset), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY)) 
+            self.chatWidgets[staffName][0].place(x = (staffChatDisplayCol0 - staffDropDownLabelOffset - (staffPixelsPerCharacterOffset*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffChatDisplayCol1 - staffDropDownLabelOffset - (staffPixelsPerCharacterOffset*len(staffName)) ), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
+            self.chatWidgets[staffName][1].place(x = (staffChatDisplayCol0 + staffDisplayDrpDwnOffset) if self.staffDisplayColCounter == 0 else (staffChatDisplayCol1 + staffDisplayDrpDwnOffset), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY)) 
 
             self.staffDisplayColCounter = not self.staffDisplayColCounter # Alternate rows
             if(increment % 2 == 1):
@@ -728,19 +730,22 @@ class PendingsMenu(tk.Frame):
 
     
     def updatePendings(self, staffName, newTime):
-
         print("Updating pendings for {} to {}".format(staffName, newTime))
+        if(newTime != None):
+        
+            hr = int(newTime.split(":")[0][:2])
+            min = int(newTime.split(":")[1][:2])
 
-        hr = int(newTime.split(":")[0][:2])
-        min = int(newTime.split(":")[1][:2])
+            if("pm" in newTime.lower() and hr != 12):
+                hr += 12
 
-        if("pm" in newTime.lower() and hr != 12):
-            hr += 12
-
-
-        if( self.controller.messageToMain(8, (staffName, datetime.time(hr, min))) == NOSUCCESS):
-            # Unable to update lunch time
-            messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
+            if( self.controller.messageToMain(8, (staffName, datetime.time(hr, min))) == NOSUCCESS):
+                # Unable to update lunch time
+                messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
+        
+        else:
+            if(self.controller.messageToMain(8, (staffName, None)) == NOSUCCESS):
+                messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
 
         return
 
@@ -771,7 +776,7 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         #self.pendingsOutput = CreateElement(controller, tk.Text, master=self, width = 27, height = 30, font=FINAL_DSP_FONT)    
 
         # Finalize button
-        self.finalizeButton = tk.Button(self, text = "Finalize", font = STD_FONT, command=self.storeRosterJson)
+        self.finalizeButton = tk.Button(self, text = "Finalize", font = STD_FONT, command=self.finalizeRoster)
 
         # Navigation buttons
         self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(PendingsMenu))
@@ -825,6 +830,11 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.lunchChatOutput.place(x = 80, y = HEADING_Y + 35)
         #self.pendingsOutput.place(x = 340, y = HEADING_Y + 35)
 
+    def finalizeRoster(self):
+        # Increment chat weights 
+
+        self.storeRosterJson()
+
     
     def storeRosterJson(self):
         self.controller.messageToMain(20, None)
@@ -837,17 +847,20 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         dateText = "Date: {}\n\n".format(self.controller.messageToMain(13, None).strftime("%d %B, %Y")) # Request date this roster is generated for from Main
 
         # Create Chat part of email
-        chatHeading = "--Chat Roster--\n"
-        chatBody = ""
         assignedChatters = self.controller.messageToMain(14, None) # Request names of staff on chats
-        print("Assigned Chatters: {}".format(assignedChatters))
-        for chatEntry in assignedChatters:
-            if(chatEntry[0] == assignedChatters[0][0]):
-                chatBody += "Main - " # First person in array is assigned Main chat
-            else:
-                chatBody += "Backup - " # All others assigned chats are backup
+        chatBody = ""
+        chatHeading = ""
+        if(assignedChatters != []):
+            chatHeading = "--Chat Roster--\n"
+            
+            print("Assigned Chatters: {}".format(assignedChatters))
+            for chatEntry in assignedChatters:
+                if(chatEntry[0] == assignedChatters[0][0]):
+                    chatBody += "Main - " # First person in array is assigned Main chat
+                else:
+                    chatBody += "Backup - " # All others assigned chats are backup
 
-            chatBody += chatEntry[0] + "\n"
+                chatBody += chatEntry[0] + "\n"
         
         # Create Lunch part of eamil
         lunchHeading = "\n\n--Lunch Roster--\n" 

@@ -185,13 +185,12 @@ def messageFromGUI(reqType, reqParam = 0):
         workingDict = dict( sorted(StaffWorking.items(), key=lambda item: item[1].actual_lunchtime) ) # Sort dict by timestamp
         # We need to group together all staff members under the same date, for this we use a dict e.g. { 11:30AM: [Isaac, Ethan]}
         for sName, sObj in workingDict.items():
-            if(sObj.actual_lunchtime != None):
-                # Object has a Lunchtime assigned
-                if(workingDate != sObj.actual_lunchtime):
-                    workingDate = sObj.actual_lunchtime
-                    reply[workingDate] = [sName]
-                else:
-                    reply[workingDate].append(sName) # This may break
+            # Object has a Lunchtime assigned
+            if(workingDate != sObj.actual_lunchtime):
+                workingDate = sObj.actual_lunchtime
+                reply[workingDate] = [sName]
+            else:
+                reply[workingDate].append(sName) # This may break
     
     elif(reqType == 16): # Requesting dict of names and assigned pending timeslots
         reply = {}
@@ -214,8 +213,6 @@ def messageFromGUI(reqType, reqParam = 0):
                 reply[workingDate] = [sName]
             else:
                 reply[workingDate].append(sName) # This may break
-
-
 
 
 

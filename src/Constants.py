@@ -63,6 +63,9 @@ staffDisplayDrpDwnOffset = 0 # Gap between start of staff name and start of drop
 staffDropDownLabelOffset = 40 # Offset between lunch drop-down menu and their name
 staffPixelsPerCharacterOffset = 6 # Move the lunch drop-down menu name this many pixels * length of their name 
 
+staffChatDisplayCol0 = 200
+staffChatDisplayCol1 = WINDOW_WIDTH / 2 + staffChatDisplayCol0
+
 PENDINGS_TIMESLOTS = [ # All possible lunch times that will show up in the drop down menu
     None,
     datetime.time(8, 00).strftime('%I:%M%p'),
