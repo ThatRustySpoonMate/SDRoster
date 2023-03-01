@@ -36,7 +36,7 @@ import requests
         apiKey <string>
 """
 def messageFromGUI(reqType, reqParam = 0):
-    global ShiftData, ShiftDataTrimmed, NumStaff
+    global ShiftData, ShiftDataTrimmed, NumStaff, RosterDate
 
     reply = ""
     print("Main received Request {} from GUI ".format( (reqType, reqParam) )) # Debug option
@@ -214,6 +214,9 @@ def messageFromGUI(reqType, reqParam = 0):
             else:
                 reply[workingDate].append(sName) # This may break
 
+    elif(reqType == 17): # Set roster generation date (From calendar)
+        RosterDate = reqParam
+        return GUIHandler.SUCCESS
 
 
     elif(reqType == 20): # Finalize roster

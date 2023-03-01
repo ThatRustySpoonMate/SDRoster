@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox# Can be used to stylize widgets, nice to have, I probably wont use it 
+from tkcalendar import Calendar
 from Normies import ITSDStaff
 import random, datetime
 from Constants import *
@@ -167,6 +168,10 @@ class MainMenu(tk.Frame):
         self.APIKeyRetrieve = CreateElement(controller, tk.Button, master=self, text = "Web: Retrieve", font=API_BTN_FONT, command=lambda:self.requestAPIKey(1))
         self.APICheck = CreateElement(controller, tk.Button, master=self, text="Check", font=API_BTN_FONT, command=self.checkAPIKey)
         self.APICheckMessage = CreateElement(controller, tk.Label, master=self, font=WARN_FONT)
+
+        # Calendar
+        self.calendar = Calendar(self, font = CALENDAR_FONT, selectmode="day", year=datetime.datetime.today().year, month = datetime.datetime.today().month, day = datetime.datetime.today().day)
+
         # Add dark mode toggle
         self.darkModeToggle = CreateElement(controller, tk.Button, master=self, text="Enable dark mode", font=STD_FONT, command = self.toggleDarkMode)  
 
@@ -197,6 +202,7 @@ class MainMenu(tk.Frame):
         self.darkModeToggle.place_forget()
         self.APICheckMessage.place_forget()
         self.navBarAdmin.place_forget()
+        self.calendar.place_forget()
         
 
         self.canvas.delete("all") # Clear canvas 
@@ -265,7 +271,8 @@ class MainMenu(tk.Frame):
         self.APIKeyLoad.place(x = (WINDOW_WIDTH / 2 - 100) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 130)
         self.APIKeyRetrieve.place(x = (WINDOW_WIDTH / 2 - 0) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 130)
         self.APICheck.place(x = (WINDOW_WIDTH / 2 + 160) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 95)
-        self.darkModeToggle.place(x = (WINDOW_WIDTH / 2 - 64) + (self.controller.showNavBar * self.controller.navBarWidth), y = WINDOW_HEIGHT - 100)
+        self.calendar.place(x = 170 + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 250)
+        self.darkModeToggle.place(x = (WINDOW_WIDTH / 2 - 64) + (self.controller.showNavBar * self.controller.navBarWidth), y = WINDOW_HEIGHT - 45)
         self.nextButton.place(x = WINDOW_WIDTH - 50, y = WINDOW_HEIGHT - 50)
 
         if(self.controller.showNavBar):
@@ -293,6 +300,10 @@ class MainMenu(tk.Frame):
     # Main then sends back SUCCESS or NOSUCCESS depending on if the key is valid
     # This function displays the output of that
     def checkAPIKey(self):
+        # First push selected calendar date to main
+        self.controller.messageToMain(17, self.calendar.selection_get())
+
+        # Then request API Key Check
         status = self.controller.messageToMain(4, self.APIKeyInput.get(1.0, tk.END).replace('\n', ""))
 
         if(status[0] == NOSUCCESS):
