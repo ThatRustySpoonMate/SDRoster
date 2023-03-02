@@ -1,3 +1,4 @@
+from datetime import datetime
 # TODO: Define WSUStaff class
 
 # ITSDStaff is a representation of Service Desk staff currently in the Service Desk group in Humanity
@@ -31,7 +32,9 @@ class ITSDStaff():
 			self.actual_lunchtime = actual_lunchtime
 			self.pendings_time = None # Allocated pendings time
 			self.set_chat = False # Flagged for chat today
-
+			self.start_time = datetime(2019,1,1,8,0) # shift start time
+			self.end_time = datetime(2019,1,1,16,0) # shift end time
+			
 		
 	# Copy constructor 
 	def copy_constructor(self, origin):
@@ -48,6 +51,8 @@ class ITSDStaff():
 		self.actual_lunchtime = origin.actual_lunchtime
 		self.pendings_time = origin.pendings_time # Allocated pendings time
 		self.set_chat = origin.set_chat
+		self.start_time = origin.start_time
+		self.end_time = origin.end_time
 
 	
 	# increments chat weight proportional to the employee's chat competency so that more experienced people are more likely to be on chat
@@ -67,4 +72,6 @@ class ITSDStaff():
 	def reset_chat_weight(self):
 		self.chat_weight = 1
 
+	def get_shift_duration(self):
+		return int(self.end_time - self.end_time).hours
 

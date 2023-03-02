@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 #				[0] - Full Name "Joe Blow"
 #				[1] - Shift start time - %Y-%m-%d%I:%M%p format
 #				[2] - Shift End time - %Y-%m-%d%I:%M%p format
+#				[3] - HumanityID
 
 
 # TODO: Also return true or false depending on API key validity
@@ -99,7 +100,7 @@ def trim_data(raw_shift_data, selected_date, shift_types):
 			shift_length = item['length']
 			start_time = datetime.strptime(selected_date + item['start_date']['time'], "%Y-%m-%d%I:%M%p") # datetime object
 			end_time = datetime.strptime(selected_date + item['end_date']['time'], "%Y-%m-%d%I:%M%p") # datetime object
-
+		
 			# iterate through items, creating a shift for an employee
 			# staff with shifts of less than 5 hours are not added to the roster
 			for employee in item['employees']:

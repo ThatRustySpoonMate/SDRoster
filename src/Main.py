@@ -48,9 +48,9 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = APIKeyHandler.retrieveFromWeb()
         
     elif(reqType == 2): # Request for lunch roster output
-        lunchSlots = LunchGenerator.GetLunchSlots(LunchWeightsDict, LunchStart, LunchEnd, NumStaff)
+        lunchSlots = LunchGenerator.GetLunchSlots(LunchWeightsDict, LunchStart, LunchEnd, 30)
 
-        reply = LunchGenerator.GetStaffLunches(lunchSlots, ShiftData)
+        reply = LunchGenerator.GetStaffLunches(lunchSlots, StaffWorking, 30, RosterDate)
 
         # Apply lunches to staff objects
         for staffName in list(reply.keys()):
