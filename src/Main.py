@@ -34,7 +34,7 @@ import requests
         apiKey <string>
 """
 def messageFromGUI(reqType, reqParam = 0):
-    global ShiftData, ShiftDataTrimmed, NumStaff, RosterDate
+    global ShiftData, ShiftDataTrimmed, NumStaff, RosterDate, LunchWeightsSelected, LunchWeightsDict
 
     reply = ""
     print("Main received Request {} from GUI ".format( (reqType, reqParam) )) # Debug option
@@ -241,11 +241,18 @@ def messageFromGUI(reqType, reqParam = 0):
 
         # Could sum the return from saveMultipleStaffDicts call and check if equal to NumStaff. If true, saving successful, if false, atleast one staff was not saved 
 
+    
+    elif(reqType == 19): # Read currently selected lunch weights
+        reply = LunchWeightsSelected
+
+    elif(reqType == 20): # Write currently selected lunch weights
+        LunchWeightsSelected = reqParam
+        LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeightsSelected)
 
 
 
 
-    elif(reqType == 20): # Finalize roster
+    elif(reqType == 25): # Finalize roster
         try:
             ObjectSerialization.outputToJson(StaffWorking)
             return GUIHandler.SUCCESS
@@ -267,7 +274,7 @@ if __name__ == "__main__":
     # Load in config data
     LunchStart = ConfigInterface.readValue("lunchStart")
     LunchEnd = ConfigInterface.readValue("lunchEnd")
-    LunchWeights = ConfigInterface.readValue("lunchWeightsDefault").split(",")
+    LunchWeightsSelected = ConfigInterface.readValue("lunchWeightsSelected").split(",")
     LunchSlotTimes = convertToDateTime(ConfigInterface.readValue("lunchSlotTimes").split(","), RosterDate )
     ShiftTypes = ConfigInterface.readValue("shiftTypes").split(",")
 
@@ -276,7 +283,9 @@ if __name__ == "__main__":
     StaffWorking = {} # Dict of all the objects corresponding to staff that are working today, key is staffname, value is object
 
     
-    LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
+    LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeightsSelected)
+    print("HERE\n\n")
+    print(LunchWeightsDict)
 
     
     # Create the GUI Application window and hand it the communication function so tht it can communicate with Main
