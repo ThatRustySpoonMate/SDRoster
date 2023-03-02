@@ -54,7 +54,6 @@ def __saveStaffObject(staffObj):
             found = True
 
     
-
     if(found):
         # Save object to corresponding file
         outputFilePath = objectsFP + staffObj.full_name + FILE_EXT
@@ -115,6 +114,17 @@ def saveMultipleStaff(staffDetailsArray):
 
     for staffObj in staffDetailsArray:
        status.append(__saveStaffObject(staffObj) )
+    
+    return status
+
+# Param1: dict of {staffName:ITSDStaffObject, staffName:ITSDStaffObject}
+# Designed to work with StaffWorking dict in Main
+# Returns a same-length array of 1/0s corresponding to save successes vs failures
+def saveMultipleStaffDict(staffDetailsDict):
+    status = []
+
+    for sName, sObj in staffDetailsDict.items():
+        status.append(__saveStaffObject(sObj) )
     
     return status
 

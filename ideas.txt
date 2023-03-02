@@ -7,8 +7,10 @@ Scroll menu for lunch roster
 Display a graph of each default lunch weighting preset? -- This would be a big flex
 Edit email heading text template button on config menu
 Add functionality for main/backup chat discrimination
-Add darkmode as default theme
-Fix None lunch not updating in finalization menu
+--Add darkmode as default theme
+--Fix None lunch not updating in finalization menu
+Add Web driver that automatically copies the API key from website into program (This may be possible)
+
 
 Optimization:
 Offload loading of staff objects from file onto separate thread when checking API key

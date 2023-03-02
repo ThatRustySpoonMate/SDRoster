@@ -853,6 +853,7 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
 
     def finalizeRoster(self):
         # Increment chat weights 
+        self.controller.messageToMain(18, None)
 
         self.storeRosterJson()
 
@@ -874,7 +875,6 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         if(assignedChatters != []):
             chatHeading = "--Chat Roster--\n"
             
-            print("Assigned Chatters: {}".format(assignedChatters))
             for chatEntry in assignedChatters:
                 if(chatEntry[0] == assignedChatters[0][0]):
                     chatBody += "Main - " # First person in array is assigned Main chat
@@ -887,14 +887,12 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         lunchHeading = "\n\n--Lunch Roster--\n" 
         lunchBody = ""
         assignedLunches = self.controller.messageToMain(15, None)
-        print("Assigned Lunches: {}".format(assignedLunches))
         for time, sNameList in assignedLunches.items():
             lunchBody += "{}\n{}\n".format(time.strftime('%I:%M%p'), convertListNamesToString(sNameList) )
 
         
         # Create pendings part of email
         assignedPendings = self.controller.messageToMain(16, None)
-        print("Assigned Pendings: {}".format(assignedPendings))
         pendingsHeading = ""
         pendingsBody = ""
         if(assignedPendings != {}):
@@ -1148,7 +1146,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
     def saveChanges(self):
         # Read variables from widgets into object memory
-        self.selectedStaff.chat_weight = self.chatWeightingInput.get(1.0, tk.END)
+        self.selectedStaff.chat_weight = int(self.chatWeightingInput.get(1.0, tk.END))
         self.selectedStaff.chat_competency = int(self.chatCompetencyVar.get()[:1] )
         self.selectedStaff.on_chat = self.chatCapableVar.get()
 

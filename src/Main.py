@@ -70,6 +70,10 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = GUIHandler.NOSUCCESS
     
     elif(reqType == 4): # Requesting to check provided API Key
+
+        if(reqParam == ""):
+            return (GUIHandler.NOSUCCESS, "Invalid API Key or API key has expired.")
+
         # Get staff working today
         ShiftData, NumStaff = ShiftRetreiver.get_shift_data(ShiftTypes, RosterDate, reqParam)
 
@@ -77,6 +81,7 @@ def messageFromGUI(reqType, reqParam = 0):
             # Load staff objects into memory 
             for staffDetail in ShiftData:
                 StaffWorking[staffDetail[0]] = ObjectSerialization.loadSingleStaff(staffDetail)
+                print(type(StaffWorking[staffDetail[0]].chat_weight))
 
             # Store API Key to credentials File
             APIKeyHandler.storeCredentials(reqParam)
@@ -149,7 +154,8 @@ def messageFromGUI(reqType, reqParam = 0):
             reply = ObjectSerialization.loadSingleStaff(reqParam)
         """
     
-    elif(reqType == 11): # Updating editable staff information
+    elif(reqType == 11): # Updating editable staff information (When the save button in the staff management page is pressed)
+        # reqParam is ITSDStaff object
         
         if(reqParam.full_name in list(StaffWorking.keys())):
             # If object is loaded into memory, edit it in memory and save it to the file
@@ -209,8 +215,6 @@ def messageFromGUI(reqType, reqParam = 0):
         for sName, sObj in StaffWorking.items():
             if(sObj.pendings_time != None):
                 filteredDict[sName] = sObj
-
-        print("Filtered: {}".format(filteredDict))
         
         workingDict = dict( sorted(filteredDict.items(), key=lambda item: item[1].pendings_time) ) # Sort dict by timestamp
         # We need to group together all staff members under the same date, for this we use a dict e.g. { 11:30AM: [Isaac, Ethan]}
@@ -225,6 +229,22 @@ def messageFromGUI(reqType, reqParam = 0):
     elif(reqType == 17): # Set roster generation date (From calendar)
         RosterDate = reqParam
         return GUIHandler.SUCCESS
+    
+    elif(reqType == 18): # Finalize roster
+        for sName, sObj in StaffWorking.items():
+            if(not sObj.set_chat): # Not on chat today
+                #print("Incrementing {}".format(sName))
+                StaffWorking[sName].increment_chat_weight()
+            else: # We are on chat today
+                #print("Resetting {}".format(sName))
+                StaffWorking[sName].reset_chat_weight()
+        
+        print("Saving Status: {}".format(ObjectSerialization.saveMultipleStaffDict(StaffWorking)))
+
+        # Could sum the return from saveMultipleStaffDicts call and check if equal to NumStaff. If true, saving successful, if false, atleast one staff was not saved 
+
+
+
 
 
     elif(reqType == 20): # Finalize roster

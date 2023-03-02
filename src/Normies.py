@@ -12,7 +12,7 @@
 # set_lunchtime 	- this is the set lunch time for an employee, this can be due to an agreed upon situation, or an agreed upon standard lunch time
 
 class ITSDStaff():
-	def __init__(self, full_name, chat_weight=1, chat_competency=0, pending_competency=0, on_chat=0, set_lunchtime=None, actual_lunchtime=None, email_address="temp@email.com", humanityID = "-1", origin = None):
+	def __init__(self, full_name, chat_weight=1, chat_competency=0, pending_competency=0, on_chat=0, set_lunchtime=None, actual_lunchtime=None, email_address="", humanityID = "-1", origin = None):
 
 		if(origin != None): # Copy Constructor
 			self.copy_constructor(origin)
