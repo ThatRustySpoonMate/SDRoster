@@ -170,7 +170,7 @@ class MainMenu(tk.Frame):
         self.APIKeyInput = CreateElement(controller, tk.Text, master=self, height=1, width=40, font=STD_FONT)
         self.APIKeyLoad = CreateElement(controller, tk.Button, master=self, text = "File: Load", font=API_BTN_FONT, command=lambda:self.requestAPIKey(0))
         self.APIKeyRetrieve = CreateElement(controller, tk.Button, master=self, text = "Web: Retrieve", font=API_BTN_FONT, command=lambda:self.requestAPIKey(1))
-        self.APICheck = CreateElement(controller, tk.Button, master=self, text="Check", font=API_BTN_FONT, command=self.checkAPIKey)
+        self.APICheck = CreateElement(controller, tk.Button, master=self, text="Get Shifts", font=API_BTN_FONT, command=self.checkAPIKey)
         self.APICheckMessage = CreateElement(controller, tk.Label, master=self, font=WARN_FONT)
 
         # Calendar
@@ -875,6 +875,7 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
     def finalizeRoster(self):
         # Increment chat weights 
         if(self.rosterFinalized == False): # Prevent spamming of finalize button to increase chat weights
+            print("Ran\nRan")
             self.controller.messageToMain(18, None)
 
         self.storeRosterJson()
@@ -1085,7 +1086,6 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
 
 
-    
     def onFirstLoad(self):
         # Draw all UI elements to screen
         self.draw()

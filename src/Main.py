@@ -37,7 +37,7 @@ def messageFromGUI(reqType, reqParam = 0):
     global ShiftData, ShiftDataTrimmed, NumStaff, RosterDate, LunchWeightsSelected, LunchWeightsDict
 
     reply = ""
-    print("Main received Request {} from GUI ".format( (reqType, reqParam) )) # Debug option
+    #print("Main received Request {} from GUI ".format( (reqType, reqParam) )) # Debug option
 
     if(reqType == 1): # API Key request
         if(reqParam == 0):
