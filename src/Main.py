@@ -79,6 +79,8 @@ def messageFromGUI(reqType, reqParam = 0):
             # Load staff objects into memory 
             for staffDetail in ShiftData:
                 StaffWorking[staffDetail[0]] = ObjectSerialization.loadSingleStaff(staffDetail)
+                StaffWorking[staffDetail[0]].start_time = staffDetail[1]
+                StaffWorking[staffDetail[0]].end_time = staffDetail[2]
 
             # Store API Key to credentials File
             APIKeyHandler.storeCredentials(reqParam)
@@ -127,7 +129,6 @@ def messageFromGUI(reqType, reqParam = 0):
         
     
     elif(reqType == 8): # Change assigned pendings
-        print("Recvd {}".format(reqParam))
 
         # Update the staff member's pending time in their staff member object
         try:

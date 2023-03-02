@@ -102,3 +102,5 @@ CHAT_COMPETENCIES = [
     "1 - Backup Only",
     "2 - Fully Trained"
 ]
+
+RECIPIENT_ADDRESS = "itds-ace-sdteam@westernsydney.edu.au"

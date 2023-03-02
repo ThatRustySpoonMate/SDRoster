@@ -10,7 +10,7 @@ Add functionality for main/backup chat discrimination
 --Add darkmode as default theme
 --Fix None lunch not updating in finalization menu
 Add Web driver that automatically copies the API key from website into program (This may be possible)
-
+Add toggle in config menu for HTML Rich Text email 
 
 Optimization:
 Offload loading of staff objects from file onto separate thread when checking API key

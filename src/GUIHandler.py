@@ -784,6 +784,10 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.firstLoad = True # Flag for first time loading of page
         self.rosterFinalized = False # Flag for if the roster has been finalized yet
         self.outputText = "" # Text that will go into an email
+        self.HTMLEmail = False # Flag for adding HTML tags to output email
+        self.lunchGen = True # Flag for if Lunch roster is in output of email
+        self.chatGen = False # Flag for if chat roster is in output of email
+        self.pendingsGen = False # Flag for if pendings roster is in output of email
 
         # Set background colour
         self.config(bg=BGND_COL)
@@ -794,7 +798,7 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.HamburgerMenuBtn = tk.Button(master=self, highlightthickness = 0, relief=tk.FLAT, bd=0, command=self.controller.toggleHamburgerMenu)
 
         # Heading
-        self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Finalisation", font = MENU_FONT) #tk.Label(self, text="Home Page", font = STD_FONT, fg = controller.fontCol) 
+        self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Finalisation", font = MENU_FONT)
 
         # Page content
         self.lunchChatOutput = CreateElement(controller, tk.Text, master=self, width = 60, height = 30, font=FINAL_DSP_FONT)
@@ -861,11 +865,20 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         if(self.rosterFinalized == False): # Prevent spamming of finalize button to increase chat weights
             self.controller.messageToMain(18, None)
 
-        pyperclip.copy(self.outputText) # Copy to text to clipboard
-
         self.storeRosterJson()
 
         self.rosterFinalized = True
+
+        pyperclip.copy(self.outputText) # Copy to text to clipboard
+
+        outlook = win32com.client.Dispatch('outlook.application')
+        mail = outlook.CreateItem(0)
+        mail.To = RECIPIENT_ADDRESS
+        mail.Subject = ("Lunch" * self.lunchGen) + (" & Chat" * self.chatGen) + (" & Pendings/Unassigneds" * self.pendingsGen) + " Roster - " + self.controller.messageToMain(13, None).strftime("%d %B, %Y")
+        mail.Body = self.outputText
+        
+        mail.Display(True)
+
 
     
     def storeRosterJson(self):
@@ -883,7 +896,8 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         chatBody = ""
         chatHeading = ""
         if(assignedChatters != []):
-            chatHeading = "--Chat Roster--\n"
+            self.chatGen = True
+            chatHeading = "-|Chat Roster|-\n"
             
             for chatEntry in assignedChatters:
                 if(chatEntry[0] == assignedChatters[0][0]):
@@ -892,9 +906,12 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
                     chatBody += "Backup - " # All others assigned chats are backup
 
                 chatBody += chatEntry[0] + "\n"
+        else: 
+            self.chatGen = False
+        
         
         # Create Lunch part of eamil
-        lunchHeading = "\n\n--Lunch Roster--\n" 
+        lunchHeading = "\n-|Lunch Roster|-\n" 
         lunchBody = ""
         assignedLunches = self.controller.messageToMain(15, None)
         for time, sNameList in assignedLunches.items():
@@ -906,10 +923,13 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         pendingsHeading = ""
         pendingsBody = ""
         if(assignedPendings != {}):
-            pendingsHeading = "\n--Pendings Roster--\n"
+            self.pendingsGen = True
+            pendingsHeading = "-|Pendings Roster|-\n"
 
             for time, sNameList in assignedPendings.items():
                 pendingsBody += "{}\n{}\n".format(time.strftime('%I:%M%p'), convertListNamesToString(sNameList) )
+        else:
+            self.pendingsGen = False
 
 
         return headingText + dateText + chatHeading + chatBody + lunchHeading + lunchBody + pendingsHeading + pendingsBody
