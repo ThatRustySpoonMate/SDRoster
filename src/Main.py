@@ -12,8 +12,6 @@ import random
 import threading
 
 # External deps
-import pyperclip
-import win32com.client
 import requests
 
 """
@@ -81,7 +79,6 @@ def messageFromGUI(reqType, reqParam = 0):
             # Load staff objects into memory 
             for staffDetail in ShiftData:
                 StaffWorking[staffDetail[0]] = ObjectSerialization.loadSingleStaff(staffDetail)
-                print(type(StaffWorking[staffDetail[0]].chat_weight))
 
             # Store API Key to credentials File
             APIKeyHandler.storeCredentials(reqParam)

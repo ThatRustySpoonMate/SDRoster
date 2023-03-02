@@ -7,6 +7,8 @@ from Constants import *
 from functools import partial # This is pure magic
 import sys, time
 from FormattingFunctions import *
+import pyperclip
+import win32com.client
 
 # TODO: Expand GUI
 
@@ -780,6 +782,8 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.parent = parent # Reference to parent container
         self.controller = controller # Reference to parent object
         self.firstLoad = True # Flag for first time loading of page
+        self.rosterFinalized = False # Flag for if the roster has been finalized yet
+        self.outputText = "" # Text that will go into an email
 
         # Set background colour
         self.config(bg=BGND_COL)
@@ -821,8 +825,9 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
 
     # Renders all UI Elements
     def draw(self):
+        self.outputText = self.generateEmailText()
         self.lunchChatOutput.delete(1.0, tk.END)
-        self.lunchChatOutput.insert(tk.END, self.generateEmailText())
+        self.lunchChatOutput.insert(tk.END, self.outputText)
 
         self.config(bg=BGND_COL)
 
@@ -853,9 +858,14 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
 
     def finalizeRoster(self):
         # Increment chat weights 
-        self.controller.messageToMain(18, None)
+        if(self.rosterFinalized == False): # Prevent spamming of finalize button to increase chat weights
+            self.controller.messageToMain(18, None)
+
+        pyperclip.copy(self.outputText) # Copy to text to clipboard
 
         self.storeRosterJson()
+
+        self.rosterFinalized = True
 
     
     def storeRosterJson(self):

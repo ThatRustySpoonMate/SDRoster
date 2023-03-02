@@ -82,7 +82,7 @@ def loadSingleStaff(staffDetails):
     else:
         # If no file exists, create the object anew and save it to the newly created file
         print("File Doesn't exist, creating it... {}".format(staffDetails[0]))
-        newStaff = ITSDStaff(staffDetails[0])
+        newStaff = ITSDStaff(staffDetails[0], shift_start=staffDetails[1], shift_end=staffDetails[2])
         __saveStaffObject(newStaff)
         return newStaff 
 
@@ -180,8 +180,3 @@ def outputToJson(staffWorking):
 
     rosterFile.close()
 
-
-
-
-if __name__ == "__main__":
-    print(__loadStaffObject("Ethan"))
