@@ -122,7 +122,7 @@ class RosterWindow(tk.Tk):
         self.showNavBar = not self.showNavBar
         self.activeFrame.clear()
         self.activeFrame.draw()
-        print("Hamburger Menu status: {}".format(self.showNavBar))
+        #print("Hamburger Menu status: {}".format(self.showNavBar))
 
 
     def drawCheese(self):
@@ -384,8 +384,6 @@ class MainMenu(tk.Frame):
         self.clear() # Clear the screen 
         self.draw()  # Redraw all elements using new colour scheme
 
-        print(self.controller.messageToMain(0)) # Testing, will delete later
-
 
     # Enables all navigation buttons
     def enableNavButtons(self):
@@ -470,10 +468,8 @@ class LunchRosterMenu(tk.Frame):
     def draw(self):
 
         if(self.controller.messageToMain(19, None) != self.lunchWeightsUsed):
-            print("Re-generating lunch roster")
             self.lunchTimeWidgets = {}
             self.onFirstLoad()
-            #self.lunchWeightsUsed = self.controller.messageToMain(19, None)
             return
 
         self.config(bg=BGND_COL)
@@ -520,7 +516,6 @@ class LunchRosterMenu(tk.Frame):
 
 
     def updateLunch(self, staffName, newTime):
-        print("Updating lunch for {} to {}".format(staffName, newTime))
 
         if(newTime != None):
             hr = int(newTime.split(":")[0][:2])
@@ -765,7 +760,6 @@ class PendingsMenu(tk.Frame):
 
     
     def updatePendings(self, staffName, newTime):
-        print("Updating pendings for {} to {}".format(staffName, newTime))
         if(newTime != None):
         
             hr = int(newTime.split(":")[0][:2])
@@ -875,7 +869,6 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
     def finalizeRoster(self):
         # Increment chat weights 
         if(self.rosterFinalized == False): # Prevent spamming of finalize button to increase chat weights
-            print("Ran\nRan")
             self.controller.messageToMain(18, None)
 
         self.storeRosterJson()
@@ -1021,7 +1014,6 @@ class ConfigurationMenu(tk.Frame):
     # Function that is called when a lunch weights option is selected
     # It must tell main to use the newly selected lunch weights
     def updateSelectedLunchWeights(self, newVal):
-        print(newVal)
         self.controller.messageToMain(20, ConfigInterface.parseLine(newVal).split(","))
 
         ConfigInterface.writeValue("lunchWeightsSelected", ConfigInterface.parseLine(newVal))

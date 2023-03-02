@@ -74,5 +74,5 @@ if __name__ == "__main__":
     # Example uses
     #print(readValue("lunchStart"))
     #print(writeValue("lunchStart", "11:00"))
-    print(readValues("lunchWeights"))
+    #print(readValues("lunchWeights"))
     pass
