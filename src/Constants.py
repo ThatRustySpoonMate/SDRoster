@@ -37,6 +37,7 @@ WSU_ORANGE = "#FF5C5E"
 # These are not constant as they may be manipulated in the GUI (e.g. Dark Mode edits these)
 BGND_COL = WSU_CRIMSON
 TEXT_COL = WSU_BLACK
+BTN_BGND_COL = WSU_CRIMSON
 BTN_COL = WSU_ORANGE
 TEXT_INPT_BG = LIGHT_GREY
 TEXT_INPT_FG = DARK_GREY

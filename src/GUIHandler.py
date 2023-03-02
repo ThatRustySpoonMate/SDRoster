@@ -64,6 +64,7 @@ class RosterWindow(tk.Tk):
             BTN_COL = HOT_PINK
             TEXT_INPT_BG = DARK_PINK
             TEXT_INPT_FG = HOT_PINK
+            BTN_BGND_COL = DARK_PINK
             
 
         self.wm_title("Service Desk Daily Roster Generator")
@@ -218,12 +219,12 @@ class MainMenu(tk.Frame):
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.APIKeyHeading.config(bg = BGND_COL, fg = TEXT_COL)
         self.APIKeyInput.config(bg = TEXT_INPT_BG, fg = TEXT_INPT_FG)
-        self.APIKeyLoad.config(bg= BGND_COL, fg=BTN_COL)
-        self.APIKeyRetrieve.config(bg= BGND_COL, fg=BTN_COL)
-        self.APICheck.config(bg = BGND_COL, fg=BTN_COL)
+        self.APIKeyLoad.config(bg= BTN_BGND_COL, fg=BTN_COL)
+        self.APIKeyRetrieve.config(bg= BTN_BGND_COL, fg=BTN_COL)
+        self.APICheck.config(bg = BTN_BGND_COL, fg=BTN_COL)
         self.APICheckMessage.config(bg = BGND_COL, fg=TEXT_COL)
-        self.darkModeToggle.config(bg = BGND_COL, fg=BTN_COL)
-        self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.darkModeToggle.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.nextButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
 
         
@@ -271,7 +272,7 @@ class MainMenu(tk.Frame):
         self.APIKeyLoad.place(x = (WINDOW_WIDTH / 2 - 100) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 130)
         self.APIKeyRetrieve.place(x = (WINDOW_WIDTH / 2 - 0) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 130)
         self.APICheck.place(x = (WINDOW_WIDTH / 2 + 160) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 95)
-        self.calendar.place(x = 170 + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 250)
+        self.calendar.place(x = 162 + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 250)
         self.darkModeToggle.place(x = (WINDOW_WIDTH / 2 - 64) + (self.controller.showNavBar * self.controller.navBarWidth), y = WINDOW_HEIGHT - 45)
         self.nextButton.place(x = WINDOW_WIDTH - 50, y = WINDOW_HEIGHT - 50)
 
@@ -329,7 +330,7 @@ class MainMenu(tk.Frame):
 
     # Function that toggles the state of dark mode by modifying colour 'constants' based on dark mode state
     def toggleDarkMode(self):
-        global BGND_COL, BTN_COL, TEXT_COL, TEXT_INPT_FG, TEXT_INPT_BG, NAV_BAR_COL, NAV_BAR_SUBSECT_COL
+        global BGND_COL, BTN_COL, TEXT_COL, TEXT_INPT_FG, TEXT_INPT_BG, NAV_BAR_COL, NAV_BAR_SUBSECT_COL, BTN_BGND_COL
         self.controller.darkMode = not self.controller.darkMode # Flip dark mode toggle
 
         if(self.controller.EEM != 1):
@@ -343,6 +344,7 @@ class MainMenu(tk.Frame):
                 TEXT_INPT_FG = DARK_GREY
                 NAV_BAR_COL = LIGHT_GREY
                 NAV_BAR_SUBSECT_COL = MEDIUM_GREY
+                BTN_BGND_COL = WSU_CRIMSON
 
             else:
                 # Enable Dark Mode
@@ -353,6 +355,7 @@ class MainMenu(tk.Frame):
                 TEXT_INPT_FG = LIGHT_GREY
                 NAV_BAR_COL = DARK_SLATE_BLUE  
                 NAV_BAR_SUBSECT_COL = WSU_BLACK
+                BTN_BGND_COL = LIGHT_GREY
         else:
             # Isabel mode
             if(self.controller.darkMode == 0): 
@@ -363,6 +366,7 @@ class MainMenu(tk.Frame):
                 TEXT_INPT_BG = DARK_PINK
                 TEXT_INPT_FG = HOT_PINK
                 NAV_BAR_COL = HOT_PINK
+                BTN_BGND_COL = DARK_PINK
 
             else:
                 # Enable IsabelDark Mode
@@ -372,6 +376,7 @@ class MainMenu(tk.Frame):
                 TEXT_INPT_BG = HOT_PINK
                 TEXT_INPT_FG = DARK_PINK
                 NAV_BAR_COL = DARK_PINK
+                BTN_BGND_COL = HOT_PINK
 
         self.clear() # Clear the screen 
         self.draw()  # Redraw all elements using new colour scheme
@@ -461,8 +466,8 @@ class LunchRosterMenu(tk.Frame):
 
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.nextButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.prevButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         if(self.controller.darkMode == 0):
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconLight) 
@@ -472,7 +477,7 @@ class LunchRosterMenu(tk.Frame):
         # Loop through all staff lunch labels and drop-down menus and set their colours accordingly
         for staffName in self.lunchTimeWidgets:
             self.lunchTimeWidgets[staffName][0].config(bg = BGND_COL, fg=TEXT_COL)
-            self.lunchTimeWidgets[staffName][1].config(bg = BGND_COL, fg=BTN_COL)
+            self.lunchTimeWidgets[staffName][1].config(bg = BTN_BGND_COL, fg=BTN_COL)
             self.lunchTimeWidgets[staffName][1]["highlightthickness"] = 0 # Set border size
             
 
@@ -594,8 +599,8 @@ class ChatMenu(tk.Frame):
 
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.nextButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.prevButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         if(self.controller.darkMode == 0):
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconLight) 
@@ -706,8 +711,8 @@ class PendingsMenu(tk.Frame):
 
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.nextButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.prevButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         if(self.controller.darkMode == 0):
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconLight) 
@@ -717,7 +722,7 @@ class PendingsMenu(tk.Frame):
         # Loop through all staff pendings labels and drop-down menus and set their colours accordingly
         for staffName in self.pendingsWidgets:
             self.pendingsWidgets[staffName][0].config(bg = BGND_COL, fg=TEXT_COL)
-            self.pendingsWidgets[staffName][1].config(bg = BGND_COL, fg=BTN_COL)
+            self.pendingsWidgets[staffName][1].config(bg = BTN_BGND_COL, fg=BTN_COL)
             self.pendingsWidgets[staffName][1]["highlightthickness"] = 0 # Set border size
 
 
@@ -823,8 +828,8 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
 
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.finalizeButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.prevButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.finalizeButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
         self.lunchChatOutput.config(bg=BGND_COL, fg=TEXT_COL)
         #self.pendingsOutput.config(bg=BGND_COL, fg=TEXT_COL)
 
@@ -950,7 +955,7 @@ class ConfigurationMenu(tk.Frame):
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.pageDescriptor.config(bg=BGND_COL, fg=TEXT_COL)
-        self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.closeButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 80, y = HEADING_Y)
@@ -1053,12 +1058,12 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.staffSaveButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.closeButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.staffSaveButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
         self.staffList = self.controller.messageToMain(9) # Get list of staff member data files
         self.staffListDisplay.config(bg=BGND_COL, fg=TEXT_COL)
-        self.staffLoadButton.config(bg=BGND_COL, fg=BTN_COL)
-        self.staffDeleteButton.config(bg=BGND_COL, fg=BTN_COL)
+        self.staffLoadButton.config(bg=BTN_BGND_COL, fg=BTN_COL)
+        self.staffDeleteButton.config(bg=BTN_BGND_COL, fg=BTN_COL)
         self.emailAddressLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.humanityIDLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.chatCapableButton.config(bg=BGND_COL)
@@ -1071,12 +1076,12 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.selectedStaffLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.prefLunchLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.prefLunchDropDown["highlightthickness"] = 0
-        self.prefLunchDropDown.config(bg = BGND_COL, fg=BTN_COL)
+        self.prefLunchDropDown.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         self.chatWeightingLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.chatCompetencyLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.chatCapableLabel.config(bg=BGND_COL, fg=TEXT_COL)
-        self.chatCompetencyDropDown.config(bg=BGND_COL, fg=BTN_COL)
+        self.chatCompetencyDropDown.config(bg=BTN_BGND_COL, fg=BTN_COL)
         self.chatCompetencyDropDown["highlightthickness"] = 0
 
 
@@ -1146,7 +1151,10 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.selectedStaff.chat_weight = self.chatWeightingInput.get(1.0, tk.END)
         self.selectedStaff.chat_competency = int(self.chatCompetencyVar.get()[:1] )
         self.selectedStaff.on_chat = self.chatCapableVar.get()
-        self.selectedStaff.email_address = self.emailAddressInput.get(1.0, tk.END).replace("\n", "")
+
+        emailInput = self.emailAddressInput.get(1.0, tk.END).replace("\n", "")
+        if(validateEmail(emailInput)):
+            self.selectedStaff.email_address = emailInput
         self.selectedStaff.humanityID = self.humanityIDInput.get(1.0, tk.END)
 
         # Check for None 
@@ -1157,6 +1165,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
         # Tell main to store changes to the object 
         self.controller.messageToMain( 11, self.selectedStaff )
+
 
     
     def deleteSelected(self):
