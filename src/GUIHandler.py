@@ -1,11 +1,14 @@
 import tkinter as tk
 from tkinter import ttk, messagebox# Can be used to stylize widgets, nice to have, I probably wont use it 
+from tkcalendar import Calendar
 from Normies import ITSDStaff
 import random, datetime
 from Constants import *
 from functools import partial # This is pure magic
 import sys, time
 from FormattingFunctions import *
+import pyperclip
+import win32com.client
 
 # TODO: Expand GUI
 
@@ -63,6 +66,7 @@ class RosterWindow(tk.Tk):
             BTN_COL = HOT_PINK
             TEXT_INPT_BG = DARK_PINK
             TEXT_INPT_FG = HOT_PINK
+            BTN_BGND_COL = DARK_PINK
             
 
         self.wm_title("Service Desk Daily Roster Generator")
@@ -167,6 +171,10 @@ class MainMenu(tk.Frame):
         self.APIKeyRetrieve = CreateElement(controller, tk.Button, master=self, text = "Web: Retrieve", font=API_BTN_FONT, command=lambda:self.requestAPIKey(1))
         self.APICheck = CreateElement(controller, tk.Button, master=self, text="Check", font=API_BTN_FONT, command=self.checkAPIKey)
         self.APICheckMessage = CreateElement(controller, tk.Label, master=self, font=WARN_FONT)
+
+        # Calendar
+        self.calendar = Calendar(self, font = CALENDAR_FONT, selectmode="day", year=datetime.datetime.today().year, month = datetime.datetime.today().month, day = datetime.datetime.today().day)
+
         # Add dark mode toggle
         self.darkModeToggle = CreateElement(controller, tk.Button, master=self, text="Enable dark mode", font=STD_FONT, command = self.toggleDarkMode)  
 
@@ -176,6 +184,8 @@ class MainMenu(tk.Frame):
         
     def onFirstLoad(self):
         # Draw all UI elements to screen
+
+        self.toggleDarkMode() # Start in dark mode 
 
         self.draw()
 
@@ -195,6 +205,7 @@ class MainMenu(tk.Frame):
         self.darkModeToggle.place_forget()
         self.APICheckMessage.place_forget()
         self.navBarAdmin.place_forget()
+        self.calendar.place_forget()
         
 
         self.canvas.delete("all") # Clear canvas 
@@ -210,12 +221,12 @@ class MainMenu(tk.Frame):
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.APIKeyHeading.config(bg = BGND_COL, fg = TEXT_COL)
         self.APIKeyInput.config(bg = TEXT_INPT_BG, fg = TEXT_INPT_FG)
-        self.APIKeyLoad.config(bg= BGND_COL, fg=BTN_COL)
-        self.APIKeyRetrieve.config(bg= BGND_COL, fg=BTN_COL)
-        self.APICheck.config(bg = BGND_COL, fg=BTN_COL)
+        self.APIKeyLoad.config(bg= BTN_BGND_COL, fg=BTN_COL)
+        self.APIKeyRetrieve.config(bg= BTN_BGND_COL, fg=BTN_COL)
+        self.APICheck.config(bg = BTN_BGND_COL, fg=BTN_COL)
         self.APICheckMessage.config(bg = BGND_COL, fg=TEXT_COL)
-        self.darkModeToggle.config(bg = BGND_COL, fg=BTN_COL)
-        self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.darkModeToggle.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.nextButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
 
         
@@ -263,7 +274,8 @@ class MainMenu(tk.Frame):
         self.APIKeyLoad.place(x = (WINDOW_WIDTH / 2 - 100) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 130)
         self.APIKeyRetrieve.place(x = (WINDOW_WIDTH / 2 - 0) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 130)
         self.APICheck.place(x = (WINDOW_WIDTH / 2 + 160) + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 95)
-        self.darkModeToggle.place(x = (WINDOW_WIDTH / 2 - 64) + (self.controller.showNavBar * self.controller.navBarWidth), y = WINDOW_HEIGHT - 100)
+        self.calendar.place(x = 162 + (self.controller.showNavBar * self.controller.navBarWidth), y = HEADING_Y + 250)
+        self.darkModeToggle.place(x = (WINDOW_WIDTH / 2 - 64) + (self.controller.showNavBar * self.controller.navBarWidth), y = WINDOW_HEIGHT - 45)
         self.nextButton.place(x = WINDOW_WIDTH - 50, y = WINDOW_HEIGHT - 50)
 
         if(self.controller.showNavBar):
@@ -291,6 +303,10 @@ class MainMenu(tk.Frame):
     # Main then sends back SUCCESS or NOSUCCESS depending on if the key is valid
     # This function displays the output of that
     def checkAPIKey(self):
+        # First push selected calendar date to main
+        self.controller.messageToMain(17, self.calendar.selection_get())
+
+        # Then request API Key Check
         status = self.controller.messageToMain(4, self.APIKeyInput.get(1.0, tk.END).replace('\n', ""))
 
         if(status[0] == NOSUCCESS):
@@ -316,7 +332,7 @@ class MainMenu(tk.Frame):
 
     # Function that toggles the state of dark mode by modifying colour 'constants' based on dark mode state
     def toggleDarkMode(self):
-        global BGND_COL, BTN_COL, TEXT_COL, TEXT_INPT_FG, TEXT_INPT_BG, NAV_BAR_COL, NAV_BAR_SUBSECT_COL
+        global BGND_COL, BTN_COL, TEXT_COL, TEXT_INPT_FG, TEXT_INPT_BG, NAV_BAR_COL, NAV_BAR_SUBSECT_COL, BTN_BGND_COL
         self.controller.darkMode = not self.controller.darkMode # Flip dark mode toggle
 
         if(self.controller.EEM != 1):
@@ -330,6 +346,7 @@ class MainMenu(tk.Frame):
                 TEXT_INPT_FG = DARK_GREY
                 NAV_BAR_COL = LIGHT_GREY
                 NAV_BAR_SUBSECT_COL = MEDIUM_GREY
+                BTN_BGND_COL = WSU_CRIMSON
 
             else:
                 # Enable Dark Mode
@@ -340,6 +357,7 @@ class MainMenu(tk.Frame):
                 TEXT_INPT_FG = LIGHT_GREY
                 NAV_BAR_COL = DARK_SLATE_BLUE  
                 NAV_BAR_SUBSECT_COL = WSU_BLACK
+                BTN_BGND_COL = LIGHT_GREY
         else:
             # Isabel mode
             if(self.controller.darkMode == 0): 
@@ -350,6 +368,7 @@ class MainMenu(tk.Frame):
                 TEXT_INPT_BG = DARK_PINK
                 TEXT_INPT_FG = HOT_PINK
                 NAV_BAR_COL = HOT_PINK
+                BTN_BGND_COL = DARK_PINK
 
             else:
                 # Enable IsabelDark Mode
@@ -359,6 +378,7 @@ class MainMenu(tk.Frame):
                 TEXT_INPT_BG = HOT_PINK
                 TEXT_INPT_FG = DARK_PINK
                 NAV_BAR_COL = DARK_PINK
+                BTN_BGND_COL = HOT_PINK
 
         self.clear() # Clear the screen 
         self.draw()  # Redraw all elements using new colour scheme
@@ -448,8 +468,8 @@ class LunchRosterMenu(tk.Frame):
 
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.nextButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.prevButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         if(self.controller.darkMode == 0):
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconLight) 
@@ -459,7 +479,7 @@ class LunchRosterMenu(tk.Frame):
         # Loop through all staff lunch labels and drop-down menus and set their colours accordingly
         for staffName in self.lunchTimeWidgets:
             self.lunchTimeWidgets[staffName][0].config(bg = BGND_COL, fg=TEXT_COL)
-            self.lunchTimeWidgets[staffName][1].config(bg = BGND_COL, fg=BTN_COL)
+            self.lunchTimeWidgets[staffName][1].config(bg = BTN_BGND_COL, fg=BTN_COL)
             self.lunchTimeWidgets[staffName][1]["highlightthickness"] = 0 # Set border size
             
 
@@ -490,16 +510,21 @@ class LunchRosterMenu(tk.Frame):
     def updateLunch(self, staffName, newTime):
         print("Updating lunch for {} to {}".format(staffName, newTime))
 
-        hr = int(newTime.split(":")[0][:2])
-        min = int(newTime.split(":")[1][:2])
+        if(newTime != None):
+            hr = int(newTime.split(":")[0][:2])
+            min = int(newTime.split(":")[1][:2])
 
-        if("pm" in newTime.lower() and hr != 12):
-            hr += 12
+            if("pm" in newTime.lower() and hr != 12):
+                hr += 12
 
-        if( self.controller.messageToMain(3, (staffName, datetime.time(hr, min))) == NOSUCCESS): # Pass back datetime object?
-            # Unable to update lunch time
-            messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
+            if( self.controller.messageToMain(3, (staffName, datetime.time(hr, min))) == NOSUCCESS): # Pass back datetime object
+                # Unable to update lunch time
+                messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
 
+        else:
+            if( self.controller.messageToMain(3, (staffName, None)) == NOSUCCESS): # Pass back datetime object
+                # Unable to update lunch time
+                messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
         return
 
         
@@ -576,8 +601,8 @@ class ChatMenu(tk.Frame):
 
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.nextButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.prevButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         if(self.controller.darkMode == 0):
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconLight) 
@@ -600,8 +625,8 @@ class ChatMenu(tk.Frame):
         increment = 0
         for staffName in self.chatWidgets:
 
-            self.chatWidgets[staffName][0].place(x = (staffDisplayCol0 - (10*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 - (10*len(staffName))), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
-            self.chatWidgets[staffName][1].place(x = (staffDisplayCol0 + staffDisplayDrpDwnOffset) if self.staffDisplayColCounter == 0 else (staffDisplayCol1 + staffDisplayDrpDwnOffset), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY)) 
+            self.chatWidgets[staffName][0].place(x = (staffChatDisplayCol0 - staffDropDownLabelOffset - (staffPixelsPerCharacterOffset*len(staffName)) ) if self.staffDisplayColCounter == 0 else (staffChatDisplayCol1 - staffDropDownLabelOffset - (staffPixelsPerCharacterOffset*len(staffName)) ), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY))
+            self.chatWidgets[staffName][1].place(x = (staffChatDisplayCol0 + staffDisplayDrpDwnOffset) if self.staffDisplayColCounter == 0 else (staffChatDisplayCol1 + staffDisplayDrpDwnOffset), y = staffDisplayStartY + (self.staffDisplayRowCounter * staffDisplayIncrementY)) 
 
             self.staffDisplayColCounter = not self.staffDisplayColCounter # Alternate rows
             if(increment % 2 == 1):
@@ -645,13 +670,17 @@ class PendingsMenu(tk.Frame):
         self.HamburgerMenuBtn = tk.Button(master=self, highlightthickness = 0, relief=tk.FLAT, bd=0, command=self.controller.toggleHamburgerMenu)
 
         # Navigation buttons
-        self.nextButton = CreateElement(controller, tk.Button, master=self, text=">", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(FinalizeMenu) )
-        self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(ChatMenu))
+        self.nextButton = CreateElement(controller, tk.Button, master=self, text=">", font = NAV_BTN_FONT, width=2, command = lambda:self.controller.show_frame(FinalizeMenu) )
+        self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:self.controller.show_frame(ChatMenu))
         
     
     def onFirstLoad(self):
         # Request pendings roster from main and store it in member variable
         self.pendingsRoster = self.controller.messageToMain(6).copy()
+
+        for k, v in self.pendingsRoster.items():
+            self.pendingsRoster[k] = v.strftime('%I:%M%p')
+
 
         # Create a label and drop down for each staff member (label) and their lunch times (Drop down)
         for staffName in self.pendingsRoster:
@@ -684,8 +713,8 @@ class PendingsMenu(tk.Frame):
 
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.nextButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.nextButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.prevButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         if(self.controller.darkMode == 0):
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconLight) 
@@ -695,7 +724,7 @@ class PendingsMenu(tk.Frame):
         # Loop through all staff pendings labels and drop-down menus and set their colours accordingly
         for staffName in self.pendingsWidgets:
             self.pendingsWidgets[staffName][0].config(bg = BGND_COL, fg=TEXT_COL)
-            self.pendingsWidgets[staffName][1].config(bg = BGND_COL, fg=BTN_COL)
+            self.pendingsWidgets[staffName][1].config(bg = BTN_BGND_COL, fg=BTN_COL)
             self.pendingsWidgets[staffName][1]["highlightthickness"] = 0 # Set border size
 
 
@@ -725,9 +754,21 @@ class PendingsMenu(tk.Frame):
     
     def updatePendings(self, staffName, newTime):
         print("Updating pendings for {} to {}".format(staffName, newTime))
-        if( self.controller.messageToMain(8, (staffName, newTime)) == NOSUCCESS):
-            # Unable to update lunch time
-            messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
+        if(newTime != None):
+        
+            hr = int(newTime.split(":")[0][:2])
+            min = int(newTime.split(":")[1][:2])
+
+            if("pm" in newTime.lower() and hr != 12):
+                hr += 12
+
+            if( self.controller.messageToMain(8, (staffName, datetime.time(hr, min))) == NOSUCCESS):
+                # Unable to update lunch time
+                messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
+        
+        else:
+            if(self.controller.messageToMain(8, (staffName, None)) == NOSUCCESS):
+                messagebox.showerror("Override error", "Operation failed\nPlease check inputs and try again.") 
 
         return
 
@@ -741,6 +782,8 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.parent = parent # Reference to parent container
         self.controller = controller # Reference to parent object
         self.firstLoad = True # Flag for first time loading of page
+        self.rosterFinalized = False # Flag for if the roster has been finalized yet
+        self.outputText = "" # Text that will go into an email
 
         # Set background colour
         self.config(bg=BGND_COL)
@@ -753,8 +796,12 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         # Heading
         self.pageLabel = CreateElement(controller, tk.Label, master=self, text="Finalisation", font = MENU_FONT) #tk.Label(self, text="Home Page", font = STD_FONT, fg = controller.fontCol) 
 
+        # Page content
+        self.lunchChatOutput = CreateElement(controller, tk.Text, master=self, width = 60, height = 30, font=FINAL_DSP_FONT)
+        #self.pendingsOutput = CreateElement(controller, tk.Text, master=self, width = 27, height = 30, font=FINAL_DSP_FONT)    
+
         # Finalize button
-        self.finalizeButton = tk.Button(self, text = "Finalize", font = STD_FONT, command=self.storeRosterJson)
+        self.finalizeButton = tk.Button(self, text = "Finalize", font = STD_FONT, command=self.finalizeRoster)
 
         # Navigation buttons
         self.prevButton = CreateElement(controller, tk.Button, master=self, text="<", font = NAV_BTN_FONT, width=2, command = lambda:controller.show_frame(PendingsMenu))
@@ -772,32 +819,100 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
         self.pageLabel.place_forget()
         self.prevButton.place_forget()
         self.finalizeButton.place_forget()
+        self.lunchChatOutput.place_forget()
+        #self.pendingsOutput.place_forget()
 
 
     # Renders all UI Elements
     def draw(self):
+        self.outputText = self.generateEmailText()
+        self.lunchChatOutput.delete(1.0, tk.END)
+        self.lunchChatOutput.insert(tk.END, self.outputText)
 
         self.config(bg=BGND_COL)
 
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.prevButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.finalizeButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.prevButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.finalizeButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.lunchChatOutput.config(bg=BGND_COL, fg=TEXT_COL)
+        #self.pendingsOutput.config(bg=BGND_COL, fg=TEXT_COL)
+
+        #self.lunchChatOutput["highlightthickness"] = 0 # Set border size
+        self.lunchChatOutput.config(relief=tk.FLAT) 
+        #self.pendingsOutput["highlightthickness"] = 0 # Set border size  
+        #self.pendingsOutput.config(relief=tk.FLAT)  
 
         if(self.controller.darkMode == 0):
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconLight) 
         else:
             self.HamburgerMenuBtn.config(width= 32, height=32, image= self.hamburgerOpenIconDark)
 
+        
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 70, y = HEADING_Y)
         self.prevButton.place(x = 20, y = WINDOW_HEIGHT - 50)
         self.finalizeButton.place(x = WINDOW_WIDTH / 2 - 25, y = WINDOW_HEIGHT - 50)
+        self.lunchChatOutput.place(x = 80, y = HEADING_Y + 35)
+        #self.pendingsOutput.place(x = 340, y = HEADING_Y + 35)
+
+    def finalizeRoster(self):
+        # Increment chat weights 
+        if(self.rosterFinalized == False): # Prevent spamming of finalize button to increase chat weights
+            self.controller.messageToMain(18, None)
+
+        pyperclip.copy(self.outputText) # Copy to text to clipboard
+
+        self.storeRosterJson()
+
+        self.rosterFinalized = True
 
     
     def storeRosterJson(self):
         self.controller.messageToMain(20, None)
         pass
+
+    def generateEmailText(self):
+
+        # Preamble
+        headingText = "*Please let a senior know if there's an issue with your allocated lunch.*\n\n"
+        dateText = "Date: {}\n\n".format(self.controller.messageToMain(13, None).strftime("%d %B, %Y")) # Request date this roster is generated for from Main
+
+        # Create Chat part of email
+        assignedChatters = self.controller.messageToMain(14, None) # Request names of staff on chats
+        chatBody = ""
+        chatHeading = ""
+        if(assignedChatters != []):
+            chatHeading = "--Chat Roster--\n"
+            
+            for chatEntry in assignedChatters:
+                if(chatEntry[0] == assignedChatters[0][0]):
+                    chatBody += "Main - " # First person in array is assigned Main chat
+                else:
+                    chatBody += "Backup - " # All others assigned chats are backup
+
+                chatBody += chatEntry[0] + "\n"
+        
+        # Create Lunch part of eamil
+        lunchHeading = "\n\n--Lunch Roster--\n" 
+        lunchBody = ""
+        assignedLunches = self.controller.messageToMain(15, None)
+        for time, sNameList in assignedLunches.items():
+            lunchBody += "{}\n{}\n".format(time.strftime('%I:%M%p'), convertListNamesToString(sNameList) )
+
+        
+        # Create pendings part of email
+        assignedPendings = self.controller.messageToMain(16, None)
+        pendingsHeading = ""
+        pendingsBody = ""
+        if(assignedPendings != {}):
+            pendingsHeading = "\n--Pendings Roster--\n"
+
+            for time, sNameList in assignedPendings.items():
+                pendingsBody += "{}\n{}\n".format(time.strftime('%I:%M%p'), convertListNamesToString(sNameList) )
+
+
+        return headingText + dateText + chatHeading + chatBody + lunchHeading + lunchBody + pendingsHeading + pendingsBody
 
 
 
@@ -819,6 +934,7 @@ class ConfigurationMenu(tk.Frame):
 
         # Description of page use
         self.pageDescriptor = CreateElement(controller, tk.Label, master=self, text="Enter any exceptions to regular rostering here", font=HEADING_FONT)
+
 
         # Prev page button
         self.closeButton = CreateElement(controller, tk.Button, master=self, text="X", font = MENU_FONT, width=2, command = lambda:controller.show_frame(None))
@@ -847,8 +963,7 @@ class ConfigurationMenu(tk.Frame):
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.pageDescriptor.config(bg=BGND_COL, fg=TEXT_COL)
-        self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
-        
+        self.closeButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 80, y = HEADING_Y)
@@ -951,12 +1066,12 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         
         # This is where elements are configured (Colours)
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
-        self.closeButton.config(bg = BGND_COL, fg=BTN_COL)
-        self.staffSaveButton.config(bg = BGND_COL, fg=BTN_COL)
+        self.closeButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.staffSaveButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
         self.staffList = self.controller.messageToMain(9) # Get list of staff member data files
         self.staffListDisplay.config(bg=BGND_COL, fg=TEXT_COL)
-        self.staffLoadButton.config(bg=BGND_COL, fg=BTN_COL)
-        self.staffDeleteButton.config(bg=BGND_COL, fg=BTN_COL)
+        self.staffLoadButton.config(bg=BTN_BGND_COL, fg=BTN_COL)
+        self.staffDeleteButton.config(bg=BTN_BGND_COL, fg=BTN_COL)
         self.emailAddressLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.humanityIDLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.chatCapableButton.config(bg=BGND_COL)
@@ -969,12 +1084,12 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
         self.selectedStaffLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.prefLunchLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.prefLunchDropDown["highlightthickness"] = 0
-        self.prefLunchDropDown.config(bg = BGND_COL, fg=BTN_COL)
+        self.prefLunchDropDown.config(bg = BTN_BGND_COL, fg=BTN_COL)
 
         self.chatWeightingLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.chatCompetencyLabel.config(bg=BGND_COL, fg=TEXT_COL)
         self.chatCapableLabel.config(bg=BGND_COL, fg=TEXT_COL)
-        self.chatCompetencyDropDown.config(bg=BGND_COL, fg=BTN_COL)
+        self.chatCompetencyDropDown.config(bg=BTN_BGND_COL, fg=BTN_COL)
         self.chatCompetencyDropDown["highlightthickness"] = 0
 
 
@@ -1041,10 +1156,13 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
     def saveChanges(self):
         # Read variables from widgets into object memory
-        self.selectedStaff.chat_weight = self.chatWeightingInput.get(1.0, tk.END)
+        self.selectedStaff.chat_weight = int(self.chatWeightingInput.get(1.0, tk.END))
         self.selectedStaff.chat_competency = int(self.chatCompetencyVar.get()[:1] )
         self.selectedStaff.on_chat = self.chatCapableVar.get()
-        self.selectedStaff.email_address = self.emailAddressInput.get(1.0, tk.END).replace("\n", "")
+
+        emailInput = self.emailAddressInput.get(1.0, tk.END).replace("\n", "")
+        if(validateEmail(emailInput)):
+            self.selectedStaff.email_address = emailInput
         self.selectedStaff.humanityID = self.humanityIDInput.get(1.0, tk.END)
 
         # Check for None 
@@ -1055,6 +1173,7 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
         # Tell main to store changes to the object 
         self.controller.messageToMain( 11, self.selectedStaff )
+
 
     
     def deleteSelected(self):

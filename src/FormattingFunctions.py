@@ -40,3 +40,29 @@ def convertStringTimeToDateTime(stringTime):
         hr += 12
 
     return datetime.time(hr, min)
+
+# Used by GUI Handler for displaying email
+# param1: list of names e.g. [Ethan Harris, Isaac Kemp, Jack Holton]
+# returns formatted string: "Ethan Harris\nIsaac Kemp\nJack Holton"
+def convertListNamesToString(listIn):
+    reply = ""
+
+    for name in listIn:
+        reply += " - " + name + "\n"
+
+    return reply
+
+
+# The aim of this function is to 
+def validateEmail(email):
+    emailValid = True
+    # This is very unoptimal but I don't have time to improve it
+    try:
+        int(email[:8])
+    except:
+        emailValid = False
+    
+    if("@westernsydney.edu.au" not in email[7:]):
+        emailValid = False
+
+    return emailValid

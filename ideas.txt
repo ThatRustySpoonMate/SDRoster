@@ -1,10 +1,15 @@
 Add calendar to home page 
-Add lunch weighting presets to config page (+deafults)
+Add lunch weighting presets to config page (+defaults)
 --Save changes to staff objects
 Handle extended hours Support
 Add context helper widgets to describe certain actions in the GUI (such as deleting staff)
 Scroll menu for lunch roster
 Display a graph of each default lunch weighting preset? -- This would be a big flex
+Edit email heading text template button on config menu
+Add functionality for main/backup chat discrimination
+--Add darkmode as default theme
+--Fix None lunch not updating in finalization menu
+Add Web driver that automatically copies the API key from website into program (This may be possible)
 
 
 Optimization:

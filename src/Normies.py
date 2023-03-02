@@ -12,25 +12,30 @@
 # set_lunchtime 	- this is the set lunch time for an employee, this can be due to an agreed upon situation, or an agreed upon standard lunch time
 
 class ITSDStaff():
-	def __init__(self, full_name, chat_weight=1, chat_competency=0, pending_competency=0, on_chat=0, set_lunchtime=None, actual_lunchtime=None, email_address="temp@email.com", humanityID = "-1", origin = None):
+	def __init__(self, full_name, chat_weight=1, chat_competency=0, pending_competency=0, on_chat=0, set_lunchtime=None, actual_lunchtime=None, email_address="", humanityID = "-1", shift_start = None, shift_end = None, origin = None):
 
 		if(origin != None): # Copy Constructor
 			self.copy_constructor(origin)
 		else:
+			# Staff Details
 			self.full_name = full_name
+			self.email_address = email_address
+			self.humanityID = humanityID
+
+			# Configuration
 			self.pending_competency = pending_competency
 			self.chat_weight = chat_weight
 			self.chat_competency = chat_competency
 			self.on_chat = on_chat # Toggle for eligible for chat today
 			self.chat_priority = False 
-			self.email_address = email_address
-			self.humanityID = humanityID
-			self.set_lunchtime = set_lunchtime # Allocated lunchtime for today
+			self.set_lunchtime = set_lunchtime  # Preferred lunch time
 
 			# Changes day-by-day
-			self.actual_lunchtime = actual_lunchtime
+			self.actual_lunchtime = actual_lunchtime # Allocated lunchtime for today
 			self.pendings_time = None # Allocated pendings time
 			self.set_chat = False # Flagged for chat today
+			self.start_time = shift_start # shift start time -- format as datetime(2019,1,1,8,0)
+			self.end_time =  shift_end # shift end time -- format as datetime(2019,1,1,16,0)
 
 		
 	# Copy constructor 
@@ -48,6 +53,9 @@ class ITSDStaff():
 		self.actual_lunchtime = origin.actual_lunchtime
 		self.pendings_time = origin.pendings_time # Allocated pendings time
 		self.set_chat = origin.set_chat
+
+		self.start_time = origin.start_time
+		self.end_time = origin.end_time
 
 	
 	# increments chat weight proportional to the employee's chat competency so that more experienced people are more likely to be on chat

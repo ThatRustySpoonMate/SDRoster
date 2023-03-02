@@ -13,6 +13,8 @@ NAV_BTN_FONT = ('Helvetica bold', 14)
 API_BTN_FONT = ('Helvetica bold', 13)
 DROP_DOWN_LABEL_FONT = ('Helvetica bold', 13)
 WARN_FONT = ('Helvetica bold', 13)
+FINAL_DSP_FONT = ('Helvetica bold', 10)
+CALENDAR_FONT = ('Helvetica bold', 11)
 
 # Colours definition
 BLACK = "#000000"
@@ -35,6 +37,7 @@ WSU_ORANGE = "#FF5C5E"
 # These are not constant as they may be manipulated in the GUI (e.g. Dark Mode edits these)
 BGND_COL = WSU_CRIMSON
 TEXT_COL = WSU_BLACK
+BTN_BGND_COL = WSU_CRIMSON
 BTN_COL = WSU_ORANGE
 TEXT_INPT_BG = LIGHT_GREY
 TEXT_INPT_FG = DARK_GREY
@@ -61,6 +64,9 @@ staffDisplayIncrementY = 50 # Gap between each row of staff lunches
 staffDisplayDrpDwnOffset = 0 # Gap between start of staff name and start of drop-down selector
 staffDropDownLabelOffset = 40 # Offset between lunch drop-down menu and their name
 staffPixelsPerCharacterOffset = 6 # Move the lunch drop-down menu name this many pixels * length of their name 
+
+staffChatDisplayCol0 = 200
+staffChatDisplayCol1 = WINDOW_WIDTH / 2 + staffChatDisplayCol0
 
 PENDINGS_TIMESLOTS = [ # All possible lunch times that will show up in the drop down menu
     None,
