@@ -1,4 +1,4 @@
-lunchWeightsSelected#1,1,1,1,1
+lunchWeightsSelected#2,1,3,1,2
 lunchWeightsEven#1,1,1,1,1
 lunchWeightsEarly#2,2,1,1,1
 lunchWeightsPreset1#2,1,3,1,2

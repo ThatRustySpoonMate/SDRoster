@@ -50,7 +50,7 @@ class RosterWindow(tk.Tk):
              # Sean Maclean detected
             if(random.randrange(0, 3) != 2):
                 #66% of time
-                messagebox.showwarning("!!CONTRACTOR DETECTED!!", "Contractor detected!\nProgram will self-destruct in t-10 seconds to protect the cheese.")
+                messagebox.showwarning("!!CONTRACTOR DETECTED!!", "Contractor detected!\nContractors are not allowed to run this script, please write out lunch roster by hand on a piece of paper and fax it to the team.")
                 self.after(10000, self.destroy)
             else:
                 # 33% of time
@@ -962,6 +962,8 @@ class ConfigurationMenu(tk.Frame):
         self.pageDescriptor = CreateElement(controller, tk.Label, master=self, text="Enter any exceptions to regular rostering here", font=HEADING_FONT)
 
         self.lunchWeightsLabel = CreateElement(controller, tk.Label, master=self, text="Lunch Weights", font = CONFIG_OPT_FONT)
+
+        # Add feature request button
         
         # Prev page button
         self.closeButton = CreateElement(controller, tk.Button, master=self, text="X", font = MENU_FONT, width=2, command = lambda:controller.show_frame(None))
