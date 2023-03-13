@@ -9,6 +9,7 @@ import sys, time
 from FormattingFunctions import *
 import pyperclip
 import win32com.client
+import ConfigInterface
 
 # TODO: Expand GUI
 
@@ -49,7 +50,7 @@ class RosterWindow(tk.Tk):
              # Sean Maclean detected
             if(random.randrange(0, 3) != 2):
                 #66% of time
-                messagebox.showwarning("!!CONTRACTOR DETECTED!!", "Contractor detected!\nProgram will self-destruct in t-10 seconds to protect the cheese.")
+                messagebox.showwarning("!!CONTRACTOR DETECTED!!", "Contractor detected!\nContractors are not allowed to run this script, please write out lunch roster by hand on a piece of paper and fax it to the team.")
                 self.after(10000, self.destroy)
             else:
                 # 33% of time
@@ -121,7 +122,7 @@ class RosterWindow(tk.Tk):
         self.showNavBar = not self.showNavBar
         self.activeFrame.clear()
         self.activeFrame.draw()
-        print("Hamburger Menu status: {}".format(self.showNavBar))
+        #print("Hamburger Menu status: {}".format(self.showNavBar))
 
 
     def drawCheese(self):
@@ -169,7 +170,7 @@ class MainMenu(tk.Frame):
         self.APIKeyInput = CreateElement(controller, tk.Text, master=self, height=1, width=40, font=STD_FONT)
         self.APIKeyLoad = CreateElement(controller, tk.Button, master=self, text = "File: Load", font=API_BTN_FONT, command=lambda:self.requestAPIKey(0))
         self.APIKeyRetrieve = CreateElement(controller, tk.Button, master=self, text = "Web: Retrieve", font=API_BTN_FONT, command=lambda:self.requestAPIKey(1))
-        self.APICheck = CreateElement(controller, tk.Button, master=self, text="Check", font=API_BTN_FONT, command=self.checkAPIKey)
+        self.APICheck = CreateElement(controller, tk.Button, master=self, text="Get Shifts", font=API_BTN_FONT, command=self.checkAPIKey)
         self.APICheckMessage = CreateElement(controller, tk.Label, master=self, font=WARN_FONT)
 
         # Calendar
@@ -383,8 +384,6 @@ class MainMenu(tk.Frame):
         self.clear() # Clear the screen 
         self.draw()  # Redraw all elements using new colour scheme
 
-        print(self.controller.messageToMain(0)) # Testing, will delete later
-
 
     # Enables all navigation buttons
     def enableNavButtons(self):
@@ -412,6 +411,8 @@ class LunchRosterMenu(tk.Frame):
         self.lunchTimes = {} # Dict of all staff and their lunches 
         self.lunchTimeWidgets = {} # dict of staff name as key and array of label, drop-down widget and stringVar literal of the currently selected option e.g. { "ethan":[tk.label, tk.dropDown, StringVar] }
         self.lunch_options = LUNCH_TIMESLOTS
+
+        self.lunchWeightsUsed = None # If lunch weights are changed after generating a roster, we need to re-generate roster with new lunch weights
         
 
         # Set background colour
@@ -432,11 +433,12 @@ class LunchRosterMenu(tk.Frame):
 
 
     def onFirstLoad(self):
-
+        
         # Request a lunch roster to display, this can then be edited by the user
         self.lunchTimes = self.controller.messageToMain(2).copy()
         for k, v in self.lunchTimes.items():
             self.lunchTimes[k] = v.strftime('%I:%M%p')
+
         
         # Create a label and drop down for each staff member (label) and their lunch times (Drop down)
         for staffName in self.lunchTimes:
@@ -444,6 +446,7 @@ class LunchRosterMenu(tk.Frame):
             setString.set(self.lunchTimes[staffName]) # Set this variable to this staff members allocated lunch time
             self.lunchTimeWidgets[staffName] = [ CreateElement(self.controller, tk.Label, master=self, text = staffName, font=DROP_DOWN_LABEL_FONT), tk.OptionMenu(self, setString, *self.lunch_options, command = partial(self.updateLunch, staffName)), setString ]
         
+        self.lunchWeightsUsed = self.controller.messageToMain(19, None)
 
         # Draw all UI elements to screen
         self.draw()
@@ -463,6 +466,11 @@ class LunchRosterMenu(tk.Frame):
 
     # Renders all UI Elements
     def draw(self):
+
+        if(self.controller.messageToMain(19, None) != self.lunchWeightsUsed):
+            self.lunchTimeWidgets = {}
+            self.onFirstLoad()
+            return
 
         self.config(bg=BGND_COL)
 
@@ -508,7 +516,6 @@ class LunchRosterMenu(tk.Frame):
 
 
     def updateLunch(self, staffName, newTime):
-        print("Updating lunch for {} to {}".format(staffName, newTime))
 
         if(newTime != None):
             hr = int(newTime.split(":")[0][:2])
@@ -753,7 +760,6 @@ class PendingsMenu(tk.Frame):
 
     
     def updatePendings(self, staffName, newTime):
-        print("Updating pendings for {} to {}".format(staffName, newTime))
         if(newTime != None):
         
             hr = int(newTime.split(":")[0][:2])
@@ -882,7 +888,7 @@ class FinalizeMenu(tk.Frame): # Overrides and serializing objects etc...
 
     
     def storeRosterJson(self):
-        self.controller.messageToMain(20, None)
+        self.controller.messageToMain(25, None)
         pass
 
     def generateEmailText(self):
@@ -955,13 +961,20 @@ class ConfigurationMenu(tk.Frame):
         # Description of page use
         self.pageDescriptor = CreateElement(controller, tk.Label, master=self, text="Enter any exceptions to regular rostering here", font=HEADING_FONT)
 
+        self.lunchWeightsLabel = CreateElement(controller, tk.Label, master=self, text="Lunch Weights", font = CONFIG_OPT_FONT)
 
+        # Add feature request button
+        
         # Prev page button
         self.closeButton = CreateElement(controller, tk.Button, master=self, text="X", font = MENU_FONT, width=2, command = lambda:controller.show_frame(None))
 
     
     def onFirstLoad(self):
-
+        self.lunchWeightsOptions = ConfigInterface.readValues("lunchWeights")
+        del self.lunchWeightsOptions[0]
+        self.selectedLunchWeights = tk.StringVar() # Create tkinter variable for the selected drop-down value
+        self.selectedLunchWeights.set(None)
+        self.selectedLunchWeightsSelection = tk.OptionMenu(self, self.selectedLunchWeights, *self.lunchWeightsOptions, command = self.updateSelectedLunchWeights)
         # Draw all UI elements to screen
         self.draw()
         self.firstLoad = False
@@ -973,10 +986,14 @@ class ConfigurationMenu(tk.Frame):
         self.pageLabel.place_forget()
         self.pageDescriptor.place_forget()
         self.closeButton.place_forget()
+        self.lunchWeightsLabel.place_forget()
+        self.selectedLunchWeightsSelection.place_forget()
 
 
     # Renders all UI Elements
     def draw(self):
+        
+        self.selectedLunchWeights.set(self.controller.messageToMain(19, None))
 
         self.config(bg=BGND_COL)
 
@@ -984,11 +1001,27 @@ class ConfigurationMenu(tk.Frame):
         self.pageLabel.config(bg = BGND_COL, fg=TEXT_COL)
         self.pageDescriptor.config(bg=BGND_COL, fg=TEXT_COL)
         self.closeButton.config(bg = BTN_BGND_COL, fg=BTN_COL)
+        self.lunchWeightsLabel.config(bg=BGND_COL, fg=TEXT_COL)
+        self.selectedLunchWeightsSelection.config(bg=BTN_BGND_COL, fg=BTN_COL)
+        self.selectedLunchWeightsSelection["highlightthickness"] = 0
+
 
         # This is where elements are placed
         self.pageLabel.place(x = WINDOW_WIDTH / 2 - 80, y = HEADING_Y)
         self.pageDescriptor.place(x = WINDOW_WIDTH / 2 - 190, y = HEADING_Y + 30)
         self.closeButton.place(x = 10, y = 10)
+        self.lunchWeightsLabel.place(x = configMenuCol0x, y = HEADING_Y + 75)
+        self.selectedLunchWeightsSelection.place(x = configMenuCol0x + 120, y = HEADING_Y + 75)
+
+    # Function that is called when a lunch weights option is selected
+    # It must tell main to use the newly selected lunch weights
+    def updateSelectedLunchWeights(self, newVal):
+        self.controller.messageToMain(20, ConfigInterface.parseLine(newVal).split(","))
+
+        ConfigInterface.writeValue("lunchWeightsSelected", ConfigInterface.parseLine(newVal))
+
+        self.clear()
+        self.draw()
 
 
 class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
@@ -1047,7 +1080,6 @@ class StaffManagementMenu(tk.Frame): # Overrides and serializing objects etc...
 
 
 
-    
     def onFirstLoad(self):
         # Draw all UI elements to screen
         self.draw()

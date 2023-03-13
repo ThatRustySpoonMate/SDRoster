@@ -34,10 +34,10 @@ import requests
         apiKey <string>
 """
 def messageFromGUI(reqType, reqParam = 0):
-    global ShiftData, ShiftDataTrimmed, NumStaff, RosterDate
+    global ShiftData, ShiftDataTrimmed, NumStaff, RosterDate, LunchWeightsSelected, LunchWeightsDict
 
     reply = ""
-    print("Main received Request {} from GUI ".format( (reqType, reqParam) )) # Debug option
+    #print("Main received Request {} from GUI ".format( (reqType, reqParam) )) # Debug option
 
     if(reqType == 1): # API Key request
         if(reqParam == 0):
@@ -55,7 +55,6 @@ def messageFromGUI(reqType, reqParam = 0):
             StaffWorking[staffName].actual_lunchtime = reply[staffName]
         
     elif(reqType == 3): # Change assigned lunch
-        print("Recvd {}".format(reqParam))
         try:
             # Update the staff member's lunch time in their staff member object
             staffName = reqParam[0]
@@ -97,7 +96,6 @@ def messageFromGUI(reqType, reqParam = 0):
 
         # Apply chat roster status to objects
         for sName, allocatedChat in reply.items():
-            print("{}:{}".format(sName, allocatedChat))
             try:
                 StaffWorking[sName].set_chat = allocatedChat
             except:
@@ -109,7 +107,6 @@ def messageFromGUI(reqType, reqParam = 0):
 
         # Apply pendings time status to objects
         for sName, allocatedPending in reply.items():
-            print("{}:{}".format(sName, allocatedPending))
             try:
                 StaffWorking[sName].pendings_time = allocatedPending
             except:
@@ -158,13 +155,11 @@ def messageFromGUI(reqType, reqParam = 0):
         if(reqParam.full_name in list(StaffWorking.keys())):
             # If object is loaded into memory, edit it in memory and save it to the file
             StaffWorking[reqParam.full_name].copy_constructor(reqParam)
-            print(StaffWorking[reqParam.full_name].full_name)
             ObjectSerialization.saveSingleStaff(StaffWorking[reqParam.full_name])
         else:
             # If object is not loaded into memory, load it, make changes and save it 
             thisStaff = ObjectSerialization.loadSingleStaff([reqParam.full_name])
             thisStaff.copy_constructor(reqParam)
-            print(thisStaff.full_name)
             ObjectSerialization.saveSingleStaff(thisStaff)
 
     elif(reqType == 12): # Request to delete a staff members data file
@@ -237,15 +232,22 @@ def messageFromGUI(reqType, reqParam = 0):
                 #print("Resetting {}".format(sName))
                 StaffWorking[sName].reset_chat_weight()
         
-        print("Saving Status: {}".format(ObjectSerialization.saveMultipleStaffDict(StaffWorking)))
+        #print("Saving Status: {}".format(ObjectSerialization.saveMultipleStaffDict(StaffWorking)))
 
         # Could sum the return from saveMultipleStaffDicts call and check if equal to NumStaff. If true, saving successful, if false, atleast one staff was not saved 
 
+    
+    elif(reqType == 19): # Read currently selected lunch weights
+        reply = LunchWeightsSelected
+
+    elif(reqType == 20): # Write currently selected lunch weights
+        LunchWeightsSelected = reqParam
+        LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeightsSelected)
 
 
 
 
-    elif(reqType == 20): # Finalize roster
+    elif(reqType == 25): # Finalize roster
         try:
             ObjectSerialization.outputToJson(StaffWorking)
             return GUIHandler.SUCCESS
@@ -267,7 +269,7 @@ if __name__ == "__main__":
     # Load in config data
     LunchStart = ConfigInterface.readValue("lunchStart")
     LunchEnd = ConfigInterface.readValue("lunchEnd")
-    LunchWeights = ConfigInterface.readValue("lunchWeightsDefault").split(",")
+    LunchWeightsSelected = ConfigInterface.readValue("lunchWeightsSelected").split(",")
     LunchSlotTimes = convertToDateTime(ConfigInterface.readValue("lunchSlotTimes").split(","), RosterDate )
     ShiftTypes = ConfigInterface.readValue("shiftTypes").split(",")
 
@@ -275,8 +277,7 @@ if __name__ == "__main__":
     ShiftData = [] # Return from get_shift_data function
     StaffWorking = {} # Dict of all the objects corresponding to staff that are working today, key is staffname, value is object
 
-    
-    LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeights)
+    LunchWeightsDict = CreateTimeSlotWeights(LunchSlotTimes, LunchWeightsSelected)
 
     
     # Create the GUI Application window and hand it the communication function so tht it can communicate with Main

@@ -15,6 +15,7 @@ DROP_DOWN_LABEL_FONT = ('Helvetica bold', 13)
 WARN_FONT = ('Helvetica bold', 13)
 FINAL_DSP_FONT = ('Helvetica bold', 10)
 CALENDAR_FONT = ('Helvetica bold', 11)
+CONFIG_OPT_FONT = ('Helvetica bold', 11)
 
 # Colours definition
 BLACK = "#000000"
@@ -67,6 +68,8 @@ staffPixelsPerCharacterOffset = 6 # Move the lunch drop-down menu name this many
 
 staffChatDisplayCol0 = 200
 staffChatDisplayCol1 = WINDOW_WIDTH / 2 + staffChatDisplayCol0
+
+configMenuCol0x = 50
 
 PENDINGS_TIMESLOTS = [ # All possible lunch times that will show up in the drop down menu
     None,

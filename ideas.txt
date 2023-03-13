@@ -1,5 +1,6 @@
 Add calendar to home page 
-Add lunch weighting presets to config page (+defaults)
+--Add lunch weighting presets to config page (+defaults)
+Add creation of lunch weighting presets
 --Save changes to staff objects
 Handle extended hours Support
 Add context helper widgets to describe certain actions in the GUI (such as deleting staff)

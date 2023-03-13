@@ -1,5 +1,5 @@
 # TODO: Write functions that interface with serialised data files
-import os, datetime
+import os, datetime, time
 
 DELIMITER = "#"
 configFP = "{}\\config\\config.txt".format(os.getcwd())
@@ -16,15 +16,35 @@ def readValue(configItem, thisDate=datetime.datetime.today().date()):
             if(output == "--end--"):
                 return None
                 
-        output = output.split(DELIMITER)[1]
+        output = parseLine(output)
     
     # Return different data types for certain config items
     if(configItem == "lunchStart" or configItem == "lunchEnd"): # Handle datetime returns
         output = datetime.datetime(thisDate.year, thisDate.month, thisDate.day, int(output.split(":")[0]), int(output.split(":")[1])) 
     
+    return output
 
+# Takes a string to search with 
+# Returns array of strings. 
+# array contains all config items with the search term in them 
+def readValues(configItemKey):
+    output = []
+    readLine = ""
+
+    with open(configFP, "r") as configFile:
+
+        while(readLine != "--end--"):
+            readLine = configFile.readline().replace("\n", "")
+
+            if(configItemKey in readLine):
+                output.append(readLine) # Continue reading line-by-line
 
     return output
+
+def parseLine(line):
+    return line.split(DELIMITER)[1]
+            
+
 
 # Function for writing the value of a key to the config file
 def writeValue(configItem, value):
@@ -54,4 +74,5 @@ if __name__ == "__main__":
     # Example uses
     #print(readValue("lunchStart"))
     #print(writeValue("lunchStart", "11:00"))
+    #print(readValues("lunchWeights"))
     pass

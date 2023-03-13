@@ -56,6 +56,8 @@ def convertListNamesToString(listIn):
 # The aim of this function is to 
 def validateEmail(email):
     emailValid = True
+
+
     # This is very unoptimal but I don't have time to improve it
     try:
         int(email[:8])
@@ -64,5 +66,8 @@ def validateEmail(email):
     
     if("@westernsydney.edu.au" not in email[7:]):
         emailValid = False
+    
+    if(email == ""):
+        emailValid = True
 
     return emailValid
